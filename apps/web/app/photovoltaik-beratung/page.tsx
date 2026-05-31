@@ -1,4 +1,5 @@
 import { TopicLeadShell } from '@/components/landing/TopicLeadShell';
+import { TopicEditorialBand } from '@/components/landing/TopicEditorialBand';
 
 export const metadata = {
   title: 'Photovoltaik-Beratung – wirtschaftlich geprüft',
@@ -14,21 +15,26 @@ export default function PVPage() {
       heroIntro="Wir prüfen, ob Photovoltaik für Ihr Gebäude wirtschaftlich sinnvoll sein kann. Mit klaren Annahmen statt aggressiven Werbeversprechen."
       category="solar"
     >
-      <div className="mx-auto max-w-6xl px-5 lg:px-8 py-14">
-        <h2 className="font-display text-xl font-bold text-navy">Schwerpunkte</h2>
-        <div className="mt-8 grid md:grid-cols-3 gap-5">
-          {[
-            { t: 'Dachfläche & Ausrichtung', d: 'Wir bewerten Fläche, Ausrichtung und Verschattung.' },
-            { t: 'Eigenverbrauch & Speicher', d: 'Eigenverbrauch ist wichtiger als die reine Anlagengröße.' },
-            { t: 'Wirtschaftlichkeit', d: 'Wir rechnen mit realistischen Annahmen, nicht mit Idealfällen.' },
-          ].map((c) => (
-            <div key={c.t} className="bg-card border border-borderLight rounded-eloLg p-7 shadow-glass">
-              <h3 className="text-[17px] font-semibold text-navy">{c.t}</h3>
-              <p className="mt-2 text-[15px] text-slate leading-relaxed">{c.d}</p>
-            </div>
-          ))}
-        </div>
-      </div>
+      <TopicEditorialBand
+        eyebrow="Wirtschaftlichkeit zuerst"
+        title="Drei Säulen unserer PV-Einordnung"
+        intro="Photovoltaik ist eine Investitionsentscheidung. Wir arbeiten mit konservativen Parametern und machen transparent, welche Annahmen Ihr Ergebnis tragen – damit Sie souverän entscheiden."
+        columns={3}
+        panels={[
+          {
+            title: 'Dachlandschaft & Ertrag',
+            body: 'Neigung, Ausrichtung, Verschattung und technische Randbedingungen – bewertet mit Blick auf langfristige Ertragsstabilität, nicht nur auf Katalogwerte.',
+          },
+          {
+            title: 'Lastprofil & Speicherlogik',
+            body: 'Der wirtschaftliche Hebel liegt im zeitlichen Zusammenspiel von Erzeugung und Verbrauch. Wir ordnen Eigenverbrauch, Speicheroption und Netzbezug nüchtern ein.',
+          },
+          {
+            title: 'Szenarien statt Idealwelt',
+            body: 'Mehrere Rechenvarianten, klar benannte Annahmen und eine ehrliche Ergebnisbandbreite – statt eines optimistischen Bestfalls, der in der Praxis selten hält.',
+          },
+        ]}
+      />
     </TopicLeadShell>
   );
 }

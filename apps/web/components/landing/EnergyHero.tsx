@@ -1,12 +1,33 @@
 'use client';
 
 import * as React from 'react';
-import Image from 'next/image';
-import { Button } from '@elo/ui';
 import { energyLandingContent } from '@/data/energyLandingContent';
 import { scrollToEnergyForm } from '@/lib/scrollToEnergyForm';
 import type { LeadCategory } from '@/types/lead';
 import { EnergyLeadForm } from './EnergyLeadForm';
+import { TrustBar } from './TrustBar';
+import { CinematicHeroBackdrop } from './CinematicHeroBackdrop';
+
+const HERO_BG_DEFAULT = {
+  desktop: '/hero/hero-desktop.png',
+  mobile: '/hero/hero-mobile.png',
+} as const;
+
+const HERO_BG_STROM = {
+  desktop: '/hero/hero-strom-desktop.png',
+  mobile: '/hero/hero-strom-mobile.png',
+} as const;
+
+const HERO_BG_GAS = {
+  desktop: '/hero/hero-gas-desktop.png',
+  mobile: '/hero/hero-gas-mobile.png',
+} as const;
+
+function heroBgForCategory(category: LeadCategory | null) {
+  if (category === 'strom') return HERO_BG_STROM;
+  if (category === 'gas') return HERO_BG_GAS;
+  return HERO_BG_DEFAULT;
+}
 
 interface EnergyHeroProps {
   headline: string;
@@ -15,23 +36,37 @@ interface EnergyHeroProps {
   emphasizeForm?: boolean;
 }
 
-/** Trust-Line: setzt die · Separatoren in Warm-Amber für ruhige Rhythmik. */
-function renderTrustLine(line: string): React.ReactNode {
-  const parts = line.split(/\s*·\s*/);
-  return parts.map((p, i) => (
-    <React.Fragment key={p}>
-      {p}
-      {i < parts.length - 1 && (
-        <span className="mx-2.5 text-warmAmber/80" aria-hidden>
-          ·
-        </span>
-      )}
-    </React.Fragment>
-  ));
+function ArrowRight() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden>
+      <path
+        d="M4 10h12M11 5l5 5-5 5"
+        stroke="currentColor"
+        strokeWidth="1.85"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
 }
 
 export function EnergyHero({ headline, subline, defaultCategory, emphasizeForm }: EnergyHeroProps) {
   const h = energyLandingContent.hero;
+
+  const [heroCategory, setHeroCategory] = React.useState<LeadCategory | null>(defaultCategory ?? null);
+
+  React.useEffect(() => {
+    setHeroCategory(defaultCategory ?? null);
+  }, [defaultCategory]);
+
+  React.useEffect(() => {
+    const onPreset = (e: Event) => {
+      const ce = e as CustomEvent<LeadCategory>;
+      if (ce.detail) setHeroCategory(ce.detail);
+    };
+    window.addEventListener('agi-preset-category', onPreset as EventListener);
+    return () => window.removeEventListener('agi-preset-category', onPreset as EventListener);
+  }, []);
 
   React.useEffect(() => {
     if (!emphasizeForm) return;
@@ -41,71 +76,84 @@ export function EnergyHero({ headline, subline, defaultCategory, emphasizeForm }
     return () => window.clearTimeout(t);
   }, [emphasizeForm]);
 
+  const bg = heroBgForCategory(heroCategory);
+
   return (
-    <section className="relative isolate overflow-hidden bg-black min-h-[720px] lg:min-h-[820px]">
-      {/* Premium Hintergrundbild – 0 % Bildbearbeitung, native Schärfe */}
-      <Image
-        src="/hero/premium-night.png"
-        alt=""
-        fill
-        priority
-        quality={100}
-        unoptimized
-        sizes="100vw"
-        className="object-cover object-center -z-20 select-none pointer-events-none [image-rendering:high-quality]"
-      />
+    <section
+      className="
+        hero-cinematic
+        relative isolate overflow-hidden bg-[#02060c]
+        flex flex-col
+        min-h-svh
+        lg:min-h-[100svh]
+        agi-hero-bleed-under-nav
+      "
+    >
+      <CinematicHeroBackdrop desktopSrc={bg.desktop} mobileSrc={bg.mobile} />
 
-      {/* Minimal: zarter Übergang zur Glas-Navbar oben und zur Trust-Bar unten */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-28 -z-10 hero-fade-top" aria-hidden />
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 -z-10 hero-fade-bottom" aria-hidden />
-
-      <div className="relative mx-auto max-w-6xl px-5 lg:px-8 pt-28 sm:pt-32 pb-24 lg:pt-44 lg:pb-32">
-        <div className="grid gap-14 lg:gap-20 lg:grid-cols-12 lg:items-start">
-          {/* Linke Spalte – Headline & Vertrauen */}
-          <div className="lg:col-span-6 lg:pt-2 space-y-7 agi-fade-up">
-            <div className="space-y-2.5">
-              <p className="text-[11.5px] sm:text-[12px] font-semibold tracking-[0.26em] text-warmAmber uppercase text-hero-trust">
-                {h.eyebrow}
-              </p>
-              <p className="flex items-center gap-3 text-[11.5px] sm:text-[12px] font-semibold tracking-[0.28em] text-softWhite uppercase text-hero-trust">
-                <span
-                  aria-hidden
-                  className="h-px w-10 bg-gradient-to-r from-warmAmber/80 to-transparent"
-                />
-                <span className="inline-flex items-center">
-                  {h.eyebrowCategories.split(/\s*·\s*/).map((part, i, arr) => (
-                    <React.Fragment key={part}>
-                      {part}
-                      {i < arr.length - 1 && (
-                        <span className="mx-2.5 text-warmAmber" aria-hidden>
-                          ·
-                        </span>
-                      )}
-                    </React.Fragment>
-                  ))}
-                </span>
-              </p>
-            </div>
-
-            <h1 className="font-display text-[38px] sm:text-[50px] lg:text-[62px] font-semibold leading-[1.03] tracking-[-0.022em] text-softWhite text-hero-display">
+      {/* Content – z-index über Overlays */}
+      <div
+        className="
+          relative z-[2] flex-1 w-full flex flex-col justify-center
+          mx-auto max-w-[1480px]
+          px-5 sm:px-8 lg:px-12
+          pt-[calc(env(safe-area-inset-top)+var(--agi-header-row)+92px)]
+          sm:pt-[calc(env(safe-area-inset-top)+var(--agi-header-row)+96px)]
+          lg:pt-[calc(env(safe-area-inset-top)+var(--agi-header-row)+120px)]
+          pb-9 sm:pb-12 lg:pb-[120px]
+        "
+      >
+        <div
+          className="
+            grid w-full
+            grid-cols-1
+            lg:grid-cols-[0.95fr_1.05fr]
+            gap-9 sm:gap-12 lg:gap-[72px]
+            items-center
+          "
+        >
+          <div className="agi-fade-up">
+            <h1
+              className="
+                font-display
+                font-semibold
+                tracking-[-0.055em]
+                text-[#f7fbff]
+                text-hero-display
+                text-[44px] leading-[0.98]
+                sm:text-[clamp(52px,6.5vw,64px)] sm:leading-[0.96]
+                lg:text-[clamp(54px,5.2vw,76px)] lg:leading-[0.94]
+                max-w-[660px]
+              "
+            >
               {headline}
             </h1>
 
-            <p className="text-[16.5px] sm:text-[17.5px] lg:text-[18.5px] text-softWhite leading-[1.65] max-w-xl font-light text-hero-body">
+            <p
+              className="
+                text-hero-body
+                mt-6 sm:mt-7
+                text-[17px] sm:text-[18px] lg:text-[20px]
+                leading-[1.55]
+                text-[rgba(235,245,250,0.78)]
+                font-normal
+                max-w-[600px]
+              "
+            >
               {subline}
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-3 sm:items-center pt-3">
-              <Button
+            <div className="mt-7 sm:mt-[34px] flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
+              <button
                 type="button"
-                variant="primary"
-                size="xl"
-                className="sm:w-auto"
                 onClick={scrollToEnergyForm}
+                className="cta-hero-cyan"
+                aria-label={h.ctaPrimary}
               >
-                {h.ctaPrimary}
-                <span aria-hidden className="ml-1 text-white/80">→</span>
-              </Button>
+                <span>{h.ctaPrimary}</span>
+                <ArrowRight />
+              </button>
+
               <button
                 type="button"
                 aria-label="Zum Abschnitt: Ablauf der persönlichen Energieprüfung"
@@ -120,14 +168,23 @@ export function EnergyHero({ headline, subline, defaultCategory, emphasizeForm }
                     history.replaceState(null, '', '#ablauf');
                   }
                 }}
-                className="group inline-flex items-center gap-2 text-[15px] sm:text-[15.5px] font-medium text-softWhite hover:text-cyan transition-colors px-2 py-3 text-hero-fine focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan/70 focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-sm"
+                className="
+                  group inline-flex items-center gap-2
+                  text-[14.5px] sm:text-[15px] font-medium
+                  text-[rgba(245,250,255,0.74)] hover:text-cyan
+                  transition-colors px-1 py-2
+                  text-hero-fine
+                  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan/70
+                  focus-visible:ring-offset-2 focus-visible:ring-offset-[#02060c]
+                  rounded-sm
+                "
               >
-                <span className="border-b border-softWhite/35 group-hover:border-cyan transition-colors pb-1 whitespace-nowrap">
+                <span className="border-b border-white/25 group-hover:border-cyan transition-colors pb-0.5 whitespace-nowrap">
                   {h.ctaSecondary}
                 </span>
                 <svg
-                  width="14"
-                  height="14"
+                  width="13"
+                  height="13"
                   viewBox="0 0 14 14"
                   fill="none"
                   aria-hidden
@@ -143,34 +200,23 @@ export function EnergyHero({ headline, subline, defaultCategory, emphasizeForm }
                 </svg>
               </button>
             </div>
-
-            <div
-              className="h-px w-full max-w-md bg-gradient-to-r from-white/30 via-white/10 to-transparent mt-1"
-              aria-hidden
-            />
-
-            <p className="text-[14.5px] sm:text-[15px] font-medium text-softWhite max-w-lg leading-[1.65] text-hero-trust">
-              {renderTrustLine(h.trustLine)}
-            </p>
           </div>
 
-          {/* Rechte Spalte – Upload-Card */}
-          <div className="lg:col-span-6">
-            <div className="relative">
-              {/* Aura hinter der Card – holt sie aus dem Bild heraus, ohne das Bild zu dimmen */}
-              <div
-                className="pointer-events-none absolute -inset-8 rounded-[44px] bg-gradient-to-br from-warmAmber/14 via-transparent to-cyan/12 blur-2xl"
-                aria-hidden
-              />
-              <div
-                className="pointer-events-none absolute -inset-2 rounded-[36px] bg-black/25 blur-xl"
-                aria-hidden
-              />
-              <EnergyLeadForm defaultCategory={defaultCategory ?? null} emphasize={emphasizeForm} />
-            </div>
+          <div className="relative z-[2]">
+            <div
+              className="pointer-events-none absolute -inset-5 rounded-[40px] bg-gradient-to-br from-[#39d8e8]/10 via-transparent to-[#1ea8ff]/8 blur-2xl"
+              aria-hidden
+            />
+            <EnergyLeadForm
+              defaultCategory={defaultCategory ?? null}
+              emphasize={emphasizeForm}
+              onCategoryChange={setHeroCategory}
+            />
           </div>
         </div>
       </div>
+
+      <TrustBar />
     </section>
   );
 }

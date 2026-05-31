@@ -73,41 +73,34 @@ export function CategorySelector({ value, onChange, disabled }: CategorySelector
             aria-pressed={sel}
             onClick={() => onChange(id)}
             className={cn(
-              'group relative flex items-center gap-3 rounded-xl border px-3.5 py-3 text-left min-h-[60px] transition-all',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-white/80 focus-visible:ring-cyan',
+              'category-pill group relative flex items-center gap-2.5 rounded-xl px-[14px] py-2 text-left h-[56px]',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-0 focus-visible:ring-cyan',
               disabled && 'opacity-50 cursor-not-allowed',
-              sel
-                ? 'border-cyan/70 bg-cyan/[0.06] shadow-[0_0_0_3px_rgba(79,209,197,0.08)]'
-                : 'border-borderLight bg-white/55 hover:border-cyan/35 hover:bg-white/80',
+              sel && 'category-pill--selected',
             )}
           >
             <span
-              className={cn(
-                'flex size-9 items-center justify-center rounded-lg transition-colors',
-                sel
-                  ? 'bg-cyan/15 text-cyanDeep'
-                  : 'bg-bgSoft text-graphite/80 group-hover:text-cyanDeep',
-              )}
+              className="cat-icon-frame flex size-8 items-center justify-center rounded-lg shrink-0"
               aria-hidden
             >
               {ICONS[id]}
             </span>
-            <span className="flex flex-col leading-tight">
-              <span className="font-display text-[14.5px] font-semibold text-navy">
+            <span className="flex flex-col leading-tight min-w-0">
+              <span className="cat-label font-display text-[13.5px] font-semibold tracking-[-0.005em] truncate">
                 {meta.label}
               </span>
-              <span className="text-[11.5px] text-slate">{meta.hint}</span>
+              <span className="cat-hint text-[11px] truncate">{meta.hint}</span>
             </span>
             {sel && (
               <span
-                className="absolute top-2 right-2 flex size-5 items-center justify-center rounded-full bg-cyan/90 text-white"
+                className="absolute top-1.5 right-1.5 flex size-[18px] items-center justify-center rounded-full bg-[rgba(57,216,232,0.95)] text-[#04080d] shadow-[0_0_0_3px_rgba(57,216,232,0.18)]"
                 aria-hidden
               >
                 <svg width="10" height="10" viewBox="0 0 14 14" fill="none">
                   <path
                     d="M2.8 7.2L5.6 10L11.2 4"
                     stroke="currentColor"
-                    strokeWidth="2"
+                    strokeWidth="2.2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
                   />

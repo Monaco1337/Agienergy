@@ -1,71 +1,133 @@
+'use client';
+
+import Image from 'next/image';
 import { energyLandingContent } from '@/data/energyLandingContent';
-import { GlassCard } from '@elo/ui';
+import { scrollToEnergyForm } from '@/lib/scrollToEnergyForm';
+
+function CheckGlyph() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 14 14" fill="none" aria-hidden>
+      <path
+        d="M2.6 7.4l2.9 2.8L11.4 4"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function ArrowRight() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden>
+      <path
+        d="M4 10h12M11 5l5 5-5 5"
+        stroke="currentColor"
+        strokeWidth="1.85"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
 
 export function ConciergeSection() {
-  const { eyebrow, title, intro, bullets, previewStatuses } = energyLandingContent.concierge;
+  const { eyebrow, title, intro, bullets, cta, portraitAlt } = energyLandingContent.concierge;
+
   return (
-    <section className="py-20 sm:py-24 bg-softWhite">
-      <div className="mx-auto max-w-6xl px-5 lg:px-8 grid lg:grid-cols-2 gap-12 lg:gap-20 items-start">
-        <div>
-          <p className="text-[11px] font-medium tracking-[0.2em] text-cyanDeep uppercase">{eyebrow}</p>
-          <h2 className="mt-3 font-display text-[28px] sm:text-[36px] lg:text-[40px] font-semibold text-navy tracking-tight leading-[1.15]">
+    <section className="section-concierge-dark relative isolate">
+      <div className="concierge-grid">
+        {/* Portrait – frei integriert, ohne sichtbaren Container.
+            Auf Mobile via flex order am Ende, auf Desktop links. */}
+        <div className="concierge-portrait">
+          <Image
+            src="/people/concierge.png"
+            alt={portraitAlt}
+            fill
+            priority={false}
+            sizes="(min-width: 1024px) 56vw, 100vw"
+            className="select-none pointer-events-none"
+          />
+        </div>
+
+        {/* Content – flex-col damit Mobile-Reihenfolge per order steuerbar ist
+            Mobile: eyebrow → headline → body → CTA → checklist
+            Desktop: eyebrow → headline → body → checklist → CTA */}
+        <div className="concierge-content flex flex-col">
+          <p
+            className="
+              uppercase font-semibold
+              text-[11.5px] sm:text-[12px]
+              tracking-[0.18em]
+              text-[#39d8e8]
+              mb-[22px]
+            "
+          >
+            {eyebrow}
+          </p>
+
+          <h2
+            className="
+              font-display font-semibold
+              text-[42px]
+              sm:text-[clamp(48px,6vw,64px)]
+              lg:text-[clamp(52px,5vw,82px)]
+              leading-[1.02] sm:leading-[0.99] lg:leading-[0.98]
+              tracking-[-0.055em]
+              text-[#f7fbff]
+              max-w-[720px]
+              mb-[34px]
+            "
+          >
             {title}
           </h2>
-          <p className="mt-5 text-[16px] sm:text-[17px] text-slate leading-[1.7] max-w-xl">{intro}</p>
 
-          <ul className="mt-8 space-y-3 text-[14.5px] text-navy">
+          <p
+            className="
+              text-[17px] sm:text-[19px] lg:text-[22px]
+              leading-[1.85]
+              text-[rgba(235,245,250,0.72)]
+              max-w-[720px]
+              mb-10 lg:mb-[44px]
+            "
+          >
+            {intro}
+          </p>
+
+          {/* CTA: Mobile vor Checklist, Desktop nach Checklist */}
+          <div className="mb-10 lg:order-2 lg:mb-0 lg:mt-2 w-full sm:w-auto">
+            <button
+              type="button"
+              onClick={scrollToEnergyForm}
+              className="concierge-cta w-full sm:w-auto"
+              aria-label={cta}
+            >
+              <span>{cta}</span>
+              <ArrowRight />
+            </button>
+          </div>
+
+          <ul className="space-y-[22px] max-w-[720px] lg:order-1 lg:mb-[44px]">
             {bullets.map((b) => (
-              <li key={b} className="flex gap-3 items-start">
-                <span
-                  className="mt-1.5 flex size-1.5 rounded-full bg-cyanDeep shrink-0"
-                  aria-hidden
-                />
-                <span className="leading-relaxed">{b}</span>
+              <li
+                key={b}
+                className="
+                  flex items-center gap-4
+                  text-[16px] sm:text-[17.5px] lg:text-[18px]
+                  font-medium
+                  text-[rgba(245,250,255,0.90)]
+                  leading-[1.4]
+                "
+              >
+                <span className="concierge-bullet-check">
+                  <CheckGlyph />
+                </span>
+                <span>{b}</span>
               </li>
             ))}
           </ul>
         </div>
-
-        <GlassCard className="p-7 sm:p-8 border-borderLight">
-          <div className="flex items-center justify-between">
-            <p className="text-[11px] uppercase tracking-[0.2em] text-slate font-medium">
-              Anfragestatus · Vorschau
-            </p>
-            <span className="flex items-center gap-1.5 text-[11px] text-cyanDeep">
-              <span className="size-1.5 rounded-full bg-cyan animate-pulse" aria-hidden />
-              live
-            </span>
-          </div>
-          <ul className="mt-6 space-y-3">
-            {previewStatuses.map((s, i) => {
-              const active = i === previewStatuses.length - 1;
-              return (
-                <li
-                  key={s}
-                  className={`flex items-center justify-between rounded-xl border px-4 py-3.5 text-[13.5px] transition-colors ${
-                    active
-                      ? 'border-cyan/40 bg-cyan/[0.05]'
-                      : 'border-borderLight bg-softWhite/80'
-                  }`}
-                >
-                  <span className="flex items-center gap-3">
-                    <span
-                      className={`flex size-2 rounded-full ${
-                        active ? 'bg-cyan' : 'bg-cyanDeep/60'
-                      }`}
-                      aria-hidden
-                    />
-                    <span className="text-navy font-medium">{s}</span>
-                  </span>
-                  <span className="text-[11px] text-slate tabular-nums">
-                    {String(i + 1).padStart(2, '0')}
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
-          <p className="mt-5 text-[11px] text-slate">Beispiel-UI · keine echten Kundendaten.</p>
-        </GlassCard>
       </div>
     </section>
   );

@@ -69,7 +69,7 @@ export function UploadDropzone({ file, onFile, error, disabled }: UploadDropzone
             pick(e.dataTransfer.files);
           }}
           className={cn(
-            'w-full cursor-pointer rounded-2xl border border-dashed px-5 py-9 text-center transition-all min-h-[150px]',
+            'upload-dropzone w-full cursor-pointer rounded-2xl border border-dashed px-5 py-4 text-center transition-all min-h-[128px]',
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-white/90 focus-visible:ring-cyan',
             disabled && 'opacity-50 cursor-not-allowed',
             error
@@ -78,8 +78,8 @@ export function UploadDropzone({ file, onFile, error, disabled }: UploadDropzone
             drag && !disabled && 'border-cyan bg-cyan/5 scale-[1.005] shadow-lift',
           )}
         >
-          <div className="mx-auto mb-3 flex size-12 items-center justify-center rounded-full bg-cyan/10 text-cyanDeep pointer-events-none">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
+          <div className="mx-auto mb-2 flex size-10 items-center justify-center rounded-full bg-cyan/10 text-cyanDeep pointer-events-none">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
               <path
                 d="M12 16V4m0 0l-4 4m4-4l4 4M6 20h12"
                 stroke="currentColor"
@@ -89,18 +89,18 @@ export function UploadDropzone({ file, onFile, error, disabled }: UploadDropzone
               />
             </svg>
           </div>
-          <p className="text-[15.5px] font-semibold text-navy pointer-events-none">
+          <p className="text-[14.5px] font-semibold text-navy pointer-events-none leading-tight">
             {copy.uploadHeadline}
           </p>
-          <p className="mt-1.5 text-[13px] text-slate pointer-events-none leading-snug">
+          <p className="mt-1 text-[12px] text-slate pointer-events-none leading-snug">
             {copy.uploadHint}
           </p>
-          <p className="mt-3 text-[12.5px] font-medium text-cyanDeep pointer-events-none">
+          <p className="mt-1.5 text-[12px] font-medium text-cyanDeep pointer-events-none">
             Datei auswählen oder hierher ziehen
           </p>
         </div>
       ) : (
-        <div className="rounded-2xl border border-borderLight bg-white/70 px-5 py-5 flex items-center gap-4">
+        <div className="upload-dropzone-filled rounded-2xl border border-borderLight bg-white/70 px-5 py-4 flex items-center gap-4">
           <div className="flex size-11 items-center justify-center rounded-xl bg-cyan/10 text-cyanDeep shrink-0">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
               <path

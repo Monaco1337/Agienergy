@@ -1,4 +1,5 @@
 import { TopicLeadShell } from '@/components/landing/TopicLeadShell';
+import { TopicEditorialBand } from '@/components/landing/TopicEditorialBand';
 
 export const metadata = {
   title: 'Stromkosten senken – persönlich geprüft',
@@ -14,28 +15,30 @@ export default function StromPage() {
       heroIntro="Wir vergleichen nicht blind Tarife. Wir schauen uns Ihre Situation an und prüfen, ob ein Wechsel oder eine Anpassung wirtschaftlich sinnvoll ist."
       category="strom"
     >
-      <div className="mx-auto max-w-6xl px-5 lg:px-8 py-14">
-        <h2 className="font-display text-xl font-bold text-navy">So arbeiten wir</h2>
-        <div className="mt-8 grid md:grid-cols-2 gap-5">
-          <div className="bg-card border border-borderLight rounded-eloLg p-7 shadow-glass">
-            <h3 className="text-[18px] font-semibold text-navy">Wie wir prüfen</h3>
-            <ul className="mt-3 space-y-2 text-[15px] text-slate">
-              <li>• Verbrauch und Lastprofil</li>
-              <li>• Tarifbestandteile und Laufzeit</li>
-              <li>• Vertragslaufzeiten und Bindung</li>
-              <li>• Individuelle Einschätzung – ohne pauschales Sparversprechen</li>
-            </ul>
-          </div>
-          <div className="bg-card border border-borderLight rounded-eloLg p-7 shadow-glass">
-            <h3 className="text-[18px] font-semibold text-navy">Was wir nicht tun</h3>
-            <ul className="mt-3 space-y-2 text-[15px] text-slate">
-              <li>• Garantierte Ersparnis ohne Prüfung</li>
-              <li>• Werbeanrufe ohne Ihre Einwilligung</li>
-              <li>• Versteckte Kosten</li>
-            </ul>
-          </div>
-        </div>
-      </div>
+      <TopicEditorialBand
+        eyebrow="Präzise Einordnung"
+        title="So arbeiten wir mit Ihren Stromdaten"
+        intro="Kein automatisierter Tarifwechsel und kein Callcenter-Druck – sondern eine ruhige, strukturierte Prüfung Ihrer Ausgangslage."
+        panels={[
+          {
+            title: 'Was wir auswerten',
+            items: [
+              'Verbrauchsverlauf und Lastprofil – belastbar statt geraten',
+              'Arbeitspreis, Grundpreis und Preisstabilität im Kontext Ihres Vertrags',
+              'Laufzeit, Kündigungsfristen und vertragliche Rahmenbedingungen',
+              'Klare Empfehlung: anpassen, wechseln – oder vorerst bewusst nichts tun',
+            ],
+          },
+          {
+            title: 'Woran Sie uns erkennen',
+            items: [
+              'Keine „garantierte Ersparnis“, bevor wir Ihre Zahlen verstanden haben',
+              'Keine Werbeanrufe und kein aggressives Nachfassen ohne Ihre Einwilligung',
+              'Keine versteckten Gebühren – Transparenz ist Teil des Standards',
+            ],
+          },
+        ]}
+      />
     </TopicLeadShell>
   );
 }

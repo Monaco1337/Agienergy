@@ -13,6 +13,7 @@ data/events.json
 data/audit.json
 data/users.json
 data/research.json
+apps/web/data/contact-inquiries.json
 *.log
 .vscode
 .idea

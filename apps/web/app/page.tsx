@@ -1,12 +1,12 @@
 import { Header } from '@/components/landing/Header';
 import { EnergyHero } from '@/components/landing/EnergyHero';
-import { TrustBar } from '@/components/landing/TrustBar';
 import { ProblemSection } from '@/components/landing/ProblemSection';
 import { ProcessSection } from '@/components/landing/ProcessSection';
 import { CategorySection } from '@/components/landing/CategorySection';
 import { ConciergeSection } from '@/components/landing/ConciergeSection';
 import { AntiScamSection } from '@/components/landing/AntiScamSection';
-import { SecuritySection } from '@/components/landing/SecuritySection';
+import { StructuredAuditSection } from '@/components/landing/StructuredAuditSection';
+import { FaqSection } from '@/components/landing/FaqSection';
 import { FinalCta } from '@/components/landing/FinalCta';
 import { Footer } from '@/components/landing/Footer';
 import { StickyMobileCta } from '@/components/landing/StickyMobileCta';
@@ -62,13 +62,13 @@ export default async function HomePage({ searchParams }: PageProps) {
           defaultCategory={defaultCategory}
           emphasizeForm={emphasizeForm}
         />
-        <TrustBar />
         <ProblemSection />
         <ProcessSection />
         <CategorySection />
         <ConciergeSection />
         <AntiScamSection />
-        <SecuritySection />
+        <StructuredAuditSection />
+        <FaqSection />
         <FinalCta />
       </main>
       <Footer />

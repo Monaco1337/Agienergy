@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { Button, Checkbox, Field, GlassCard, Badge } from '@elo/ui';
+import { Button, Checkbox, Field, GlassCard } from '@elo/ui';
 import { energyLandingContent } from '@/data/energyLandingContent';
 import { validateLeadForm, toLeadPayload } from '@/lib/leadValidation';
 import { leadMockSubmit } from '@/lib/leadMockSubmit';
@@ -14,6 +14,7 @@ import { UploadDropzone } from './UploadDropzone';
 interface EnergyLeadFormProps {
   defaultCategory?: LeadCategory | null;
   emphasize?: boolean;
+  onCategoryChange?: (category: LeadCategory | null) => void;
 }
 
 function ShieldIcon() {
@@ -30,7 +31,11 @@ function ShieldIcon() {
   );
 }
 
-export function EnergyLeadForm({ defaultCategory = null, emphasize = false }: EnergyLeadFormProps) {
+export function EnergyLeadForm({
+  defaultCategory = null,
+  emphasize = false,
+  onCategoryChange,
+}: EnergyLeadFormProps) {
   const c = energyLandingContent.leadForm;
   const [category, setCategory] = React.useState<LeadCategory | null>(defaultCategory);
   const [name, setName] = React.useState('');
@@ -45,6 +50,10 @@ export function EnergyLeadForm({ defaultCategory = null, emphasize = false }: En
   React.useEffect(() => {
     if (defaultCategory) setCategory(defaultCategory);
   }, [defaultCategory]);
+
+  React.useEffect(() => {
+    onCategoryChange?.(category);
+  }, [category, onCategoryChange]);
 
   React.useEffect(() => {
     const h = (e: Event) => {
@@ -101,10 +110,10 @@ export function EnergyLeadForm({ defaultCategory = null, emphasize = false }: En
   return (
     <GlassCard
       id={ENERGY_LEAD_FORM_ID}
+      tone="dark"
       className={
-        emphasize
-          ? 'ring-1 ring-cyan/40 ring-offset-2 ring-offset-transparent scroll-mt-28'
-          : 'scroll-mt-28'
+        'hero-form-card scroll-mt-28 ' +
+        (emphasize ? 'ring-1 ring-cyan/40 ring-offset-2 ring-offset-transparent' : '')
       }
     >
       {status === 'success' ? (
@@ -129,49 +138,44 @@ export function EnergyLeadForm({ defaultCategory = null, emphasize = false }: En
           </Button>
         </div>
       ) : (
-        <form onSubmit={onSubmit} className="p-6 sm:p-8 space-y-6" noValidate>
-          <div className="space-y-2">
-            <div className="flex items-start justify-between gap-3">
-              <h2 className="font-display text-[20px] sm:text-[22px] font-semibold text-navy tracking-tight leading-snug">
-                {c.cardTitle}
-              </h2>
-              <Badge tone="energy" className="shrink-0">
-                {c.badgeFree}
-              </Badge>
-            </div>
-            <p className="text-[13.5px] text-slate leading-relaxed">{c.cardSubline}</p>
-          </div>
-
-          <div className="hairline hairline-dark" aria-hidden />
+        <form onSubmit={onSubmit} className="p-6 sm:p-7 lg:p-[26px]" noValidate>
+          <p className="text-[13.5px] sm:text-[14px] text-slate leading-[1.5] mb-4 lg:mb-[18px]">
+            {c.cardSubline}
+          </p>
 
           {errors.general && (
             <div
               role="alert"
-              className="rounded-xl border border-error/30 bg-error/5 px-4 py-3 text-[13.5px] text-error"
+              className="mb-4 rounded-xl border border-error/30 bg-error/5 px-4 py-3 text-[13.5px] text-error"
             >
               {errors.general}
             </div>
           )}
 
-          <div className="space-y-2.5">
-            <p className="text-[12.5px] font-medium text-slate uppercase tracking-wider">Bereich</p>
+          {/* Kategorie-Auswahl – kompakt */}
+          <div className="mb-[18px]">
+            <p className="text-[11px] font-medium text-slate uppercase tracking-[0.14em] mb-2">
+              Bereich
+            </p>
             <CategorySelector value={category} onChange={setCategory} disabled={locked} />
             {errors.category && (
-              <p className="text-[13px] text-error" role="alert">
+              <p className="mt-1.5 text-[13px] text-error" role="alert">
                 {errors.category}
               </p>
             )}
           </div>
 
-          <div className="space-y-2.5">
+          {/* Upload – kompakter Premium-Drop */}
+          <div className="mb-[18px]">
             <UploadDropzone file={file} onFile={setFile} error={errors.file} disabled={locked} />
-            <p className="flex items-start gap-2 text-[12.5px] text-slate leading-relaxed">
+            <p className="mt-2 flex items-start gap-2 text-[12px] text-slate leading-[1.45]">
               <ShieldIcon />
               <span>{c.uploadTrustLine}</span>
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 gap-4">
+          {/* 2-spaltige Eingabefelder */}
+          <div className="grid sm:grid-cols-2 gap-3">
             <Field
               label="Name"
               autoComplete="name"
@@ -214,7 +218,7 @@ export function EnergyLeadForm({ defaultCategory = null, emphasize = false }: En
             />
           </div>
 
-          <div className="space-y-1.5">
+          <div className="mt-[14px] mb-[16px]">
             <Checkbox
               checked={consent}
               onChange={(e) => setConsent(e.target.checked)}
@@ -234,17 +238,17 @@ export function EnergyLeadForm({ defaultCategory = null, emphasize = false }: En
               }
             />
             {errors.consent && (
-              <p className="text-[13px] text-error" role="alert">
+              <p className="mt-1.5 text-[13px] text-error" role="alert">
                 {errors.consent}
               </p>
             )}
           </div>
 
-          <Button type="submit" variant="primary" size="xl" fullWidth disabled={locked}>
+          <Button type="submit" variant="primary" size="lg" fullWidth disabled={locked} className="h-[54px] text-[14.5px]">
             {busy ? c.submitting : c.submit}
           </Button>
 
-          <p className="text-center text-[12px] text-slate leading-relaxed">{c.submitFootnote}</p>
+          <p className="mt-2.5 text-center text-[11.5px] text-slate leading-[1.45]">{c.submitFootnote}</p>
         </form>
       )}
     </GlassCard>

@@ -1,4 +1,5 @@
 import { TopicLeadShell } from '@/components/landing/TopicLeadShell';
+import { TopicEditorialBand } from '@/components/landing/TopicEditorialBand';
 
 export const metadata = {
   title: 'Energieberatung Deutschland',
@@ -13,28 +14,30 @@ export default function Page() {
       heroIntro="Wir helfen Privatkunden, Eigentümern, Vermietern und Unternehmen, ihre Energiesituation realistisch einzuschätzen."
       category="strom"
     >
-      <div className="mx-auto max-w-6xl px-5 lg:px-8 py-14">
-        <h2 className="font-display text-xl font-bold text-navy">Leistungsüberblick</h2>
-        <div className="mt-8 grid md:grid-cols-2 gap-5">
-          <div className="bg-card border border-borderLight rounded-eloLg p-7 shadow-glass">
-            <h3 className="text-[18px] font-semibold text-navy">Für wen</h3>
-            <ul className="mt-3 space-y-2 text-[15px] text-slate">
-              <li>• Privathaushalte mit hohem Strom- oder Gasverbrauch</li>
-              <li>• Eigentümer mit PV-Potenzial</li>
-              <li>• Vermieter und Hausverwaltungen</li>
-              <li>• Unternehmen mit hohen Energiekosten</li>
-            </ul>
-          </div>
-          <div className="bg-card border border-borderLight rounded-eloLg p-7 shadow-glass">
-            <h3 className="text-[18px] font-semibold text-navy">Was Sie erhalten</h3>
-            <ul className="mt-3 space-y-2 text-[15px] text-slate">
-              <li>• Eine strukturierte Einschätzung statt Tarif-Chaos</li>
-              <li>• Verständliche Sprache ohne unnötiges Fachjargon</li>
-              <li>• Klare nächste Schritte – ohne Druck</li>
-            </ul>
-          </div>
-        </div>
-      </div>
+      <TopicEditorialBand
+        eyebrow="Leistungsportfolio"
+        title="Für wen wir Energiefragen strukturieren"
+        intro="Vom ambitionierten Privathaushalt bis zum komplexen Gewerbepark – ein Ansprechpartner, eine durchgängige Methodik."
+        panels={[
+          {
+            title: 'Zielgruppen',
+            items: [
+              'Privathaushalte mit überdurchschnittlichem Strom- oder Gasbezug',
+              'Eigentümer mit realistischem PV- oder Modernisierungspotenzial',
+              'Vermieter, Verwaltungen und institutionelle Bestandshalter',
+              'Unternehmen, bei denen Energie einen signifikanten Kostenhebel darstellt',
+            ],
+          },
+          {
+            title: 'Ihr Nutzen',
+            items: [
+              'Eine zusammenhängende Einschätzung – statt Tarif-Chaos aus vielen Quellen',
+              'Kommunikation auf Augenhöhe: fachlich präzise, ohne unnötiges Jargon',
+              'Klare nächste Schritte – frei von Kaufanreizen und verstecktem Upselling',
+            ],
+          },
+        ]}
+      />
     </TopicLeadShell>
   );
 }

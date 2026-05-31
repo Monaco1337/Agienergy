@@ -1,4 +1,5 @@
 import { TopicLeadShell } from '@/components/landing/TopicLeadShell';
+import { TopicEditorialBand } from '@/components/landing/TopicEditorialBand';
 
 export const metadata = {
   title: 'Gaskosten senken – persönlich geprüft',
@@ -14,28 +15,30 @@ export default function GasPage() {
       heroIntro="Wir bewerten Ihren Gasvertrag und prüfen, ob ein Wechsel oder eine Anpassung tatsächlich sinnvoll ist – ohne Lockangebot-Mathematik."
       category="gas"
     >
-      <div className="mx-auto max-w-6xl px-5 lg:px-8 py-14">
-        <h2 className="font-display text-xl font-bold text-navy">So arbeiten wir</h2>
-        <div className="mt-8 grid md:grid-cols-2 gap-5">
-          <div className="bg-card border border-borderLight rounded-eloLg p-7 shadow-glass">
-            <h3 className="text-[18px] font-semibold text-navy">Wie wir prüfen</h3>
-            <ul className="mt-3 space-y-2 text-[15px] text-slate">
-              <li>• Aktueller Tarif und Bindung</li>
-              <li>• Verbrauch im Vergleich zu typischen Profilen</li>
-              <li>• Region und Vertragslage</li>
-              <li>• Klare nächste Schritte</li>
-            </ul>
-          </div>
-          <div className="bg-card border border-borderLight rounded-eloLg p-7 shadow-glass">
-            <h3 className="text-[18px] font-semibold text-navy">Was Sie erhalten</h3>
-            <ul className="mt-3 space-y-2 text-[15px] text-slate">
-              <li>• Persönliche Einschätzung</li>
-              <li>• Hinweis, ob Wechsel sinnvoll sein kann</li>
-              <li>• Keine öffentliche Tarifliste</li>
-            </ul>
-          </div>
-        </div>
-      </div>
+      <TopicEditorialBand
+        eyebrow="Klare Analyse"
+        title="So bewerten wir Ihren Gasvertrag"
+        intro="Wir denken in Jahresverbrauch, regionalem Kontext und belastbarer Preislogik – nicht in Schnapszahlen aus anonymen Vergleichsportalen."
+        panels={[
+          {
+            title: 'Unsere Prüfdimensionen',
+            items: [
+              'Aktuelles Tarifwerk, Preisfindung und verbleibende Vertragslaufzeit',
+              'Abgleich Ihres Verbrauchs mit sinnvollen Referenzprofilen',
+              'Regionale Rahmenbedingungen, Zeitfenster und realistische Wechselpunkte',
+              'Handlungsempfehlung nur dort, wo sie sich für Sie rechnerisch lohnt',
+            ],
+          },
+          {
+            title: 'Was Sie von uns erhalten',
+            items: [
+              'Eine persönlich formulierte Einschätzung – keine Massen-PDF',
+              'Die ehrliche Aussage, ob ein Wechsel tragfähig sein kann',
+              'Keine generische Tarifliste, sondern maßgeschneiderte Orientierung',
+            ],
+          },
+        ]}
+      />
     </TopicLeadShell>
   );
 }

@@ -9,7 +9,7 @@ export const energyLandingContent = {
       'Ihre Energiekosten verstehen. Mit persönlicher Prüfung statt automatischer Tariflogik.',
     subline:
       'Laden Sie Ihre Jahresabrechnung hoch und erhalten Sie eine individuelle Einschätzung durch einen persönlichen Ansprechpartner – verständlich, transparent und auf Ihre Situation abgestimmt.',
-    ctaPrimary: 'Persönliche Prüfung anfragen',
+    ctaPrimary: 'Persönliche Beratung anfragen',
     ctaSecondary: 'So funktioniert es',
     trustLine:
       'Persönlicher Ansprechpartner · Vertrauliche Prüfung · Keine automatische Tarifentscheidung',
@@ -51,8 +51,8 @@ export const energyLandingContent = {
   },
   /** „Problem" → Trust-Section (persönliche Betreuung statt anonymer Vergleichslogik) */
   problem: {
-    eyebrow: 'PERSÖNLICHE BETREUUNG',
-    title: 'Persönliche Betreuung statt anonymer Vergleichslogik',
+    eyebrow: 'PERSÖNLICHE BETREUUNG STATT ANONYMER VERGLEICHSLOGIK',
+    title: 'Ihre Vorteile auf einen Blick',
     intro:
       'Viele Plattformen zeigen automatisch generierte Tariflisten. Wir prüfen jede Anfrage individuell und melden uns persönlich mit einer verständlichen Einschätzung zurück.',
     cards: [
@@ -124,18 +124,19 @@ export const energyLandingContent = {
     ],
   },
   concierge: {
-    eyebrow: 'IHR ANSPRECHPARTNER',
-    title: 'Ein fester Ansprechpartner. Keine anonyme Tariflogik.',
+    eyebrow: 'PERSONALISIERTE BETREUUNG',
+    title: 'Keine anonyme Tarifmaschine. Ein echter Ansprechpartner.',
     intro:
-      'Unsere Plattform ist nicht darauf ausgelegt, Sie mit möglichst vielen Optionen zu überfordern. Wir bereiten eine ruhige, strukturierte Prüfung vor – persönlich begleitet, vertraulich behandelt.',
+      'Ihre Anfrage wird persönlich geprüft und individuell eingeordnet. Keine automatisierten Empfehlungen. Keine Massenabfertigung.',
     bullets: [
-      'fester persönlicher Ansprechpartner',
-      'individuelle Prüfung Ihrer Unterlagen',
-      'verständliche, ruhige Rückmeldung',
-      'keine automatische Tarifvermittlung',
-      'keine öffentliche Tarifliste',
-      'für Strom, Gas, Solar und Gewerbe',
+      'Persönliche Rückmeldung',
+      'Verständliche Einschätzung',
+      'Individuelle Prüfung',
+      'Vertrauliche Bearbeitung',
     ],
+    cta: 'Persönliche Beratung anfragen',
+    portraitAlt:
+      'Persönlicher Ansprechpartner – freundlicher Berater mit modernem dunklen Anzug, ruhiger Blick, vertrauenswürdige Ausstrahlung',
     previewStatuses: [
       'Anfrage sicher eingegangen',
       'Unterlagen vertraulich erfasst',
@@ -143,12 +144,33 @@ export const energyLandingContent = {
       'Ihr Ansprechpartner erstellt Ihre Einschätzung',
     ],
   },
-  /** Anti-Scam – klares Vertrauenssignal */
+  /** Anti-Scam / Reasons-To-Switch – Vertrauens-Cards mit cyan Lichtbogen */
   antiScam: {
-    eyebrow: 'KLARE GRENZEN',
-    title: 'Keine Massenvermittlung. Keine anonyme Tarifmaschine.',
-    intro:
-      'Die Plattform dient ausschließlich zur persönlichen Prüfung Ihrer Anfrage durch einen Ansprechpartner.',
+    eyebrow: 'WARUM KUNDEN WECHSELN',
+    title: 'Warum viele Kunden eine persönliche Prüfung bevorzugen',
+    intro: '',
+    cards: [
+      {
+        id: 'tarife' as const,
+        title: 'Unübersichtliche Tarife',
+        text: 'Viele Angebote wirken günstig, enthalten aber Bedingungen und Einschränkungen.',
+      },
+      {
+        id: 'zeit' as const,
+        title: 'Keine Zeit für Vergleichsportale',
+        text: 'Kunden möchten keine stundenlangen Tarifvergleiche durchführen.',
+      },
+      {
+        id: 'einschaetzung' as const,
+        title: 'Persönliche Einschätzung',
+        text: 'Eine verständliche Rückmeldung schafft Sicherheit bei Entscheidungen.',
+      },
+      {
+        id: 'vertrauen' as const,
+        title: 'Vertrauen statt Massenabwicklung',
+        text: 'Persönliche Ansprechpartner sorgen für Klarheit und Transparenz.',
+      },
+    ],
     badges: [
       'Keine öffentliche Weitergabe Ihrer Daten',
       'Keine automatische Tarifvermittlung',
@@ -156,6 +178,76 @@ export const energyLandingContent = {
       'Persönliche Bearbeitung',
       'Vertrauliche Anfrageprüfung',
     ],
+  },
+  /** Strukturierte Energieprüfung – Premium-Trust-Block direkt nach Anti-Scam */
+  structuredAudit: {
+    eyebrow: 'STRUKTURIERTE ENERGIEPRÜFUNG',
+    title: 'Strukturierte Energieprüfung statt unübersichtlicher Vergleichslisten',
+    cards: [
+      {
+        id: 'concierge' as const,
+        title: 'Persönliche Betreuung',
+        text: 'Jede Anfrage wird individuell geprüft und durch einen festen Ansprechpartner begleitet.',
+      },
+      {
+        id: 'gdpr' as const,
+        title: 'DSGVO-orientierte Prozesse',
+        text: 'Vertrauliche Verarbeitung Ihrer Unterlagen mit strukturierter und sicherer Bearbeitung.',
+      },
+      {
+        id: 'segments' as const,
+        title: 'Für Privat & Gewerbe',
+        text: 'Strom, Gas, Solar und komplexere Verbrauchsstrukturen aus einer Hand.',
+      },
+    ],
+  },
+  /** FAQ – Premium-Trust-Block direkt nach „Strukturierte Energieprüfung" */
+  faq: {
+    eyebrow: 'HÄUFIGE FRAGEN',
+    title: 'Häufige Fragen zur persönlichen Energieprüfung',
+    items: [
+      {
+        q: 'Werden meine Daten weitergegeben?',
+        a: 'Nein. Ihre Unterlagen werden ausschließlich zur Bearbeitung Ihrer Anfrage verwendet.',
+      },
+      {
+        q: 'Muss ich sofort den Anbieter wechseln?',
+        a: 'Nein. Sie erhalten zunächst eine persönliche Einschätzung Ihrer aktuellen Situation.',
+      },
+      {
+        q: 'Ist die Prüfung kostenlos?',
+        a: 'Ja. Die erste Einschätzung erfolgt unverbindlich und kostenlos.',
+      },
+      {
+        q: 'Wer prüft meine Anfrage?',
+        a: 'Ihre Anfrage wird persönlich durch einen Ansprechpartner bearbeitet.',
+      },
+      {
+        q: 'Kann ich auch Gewerbeverträge prüfen lassen?',
+        a: 'Ja. Die Plattform unterstützt Privat- und Gewerbekunden.',
+      },
+    ],
+  },
+  /** Kontakt unter FAQ – Nachricht an CRM / Webhook */
+  faqContact: {
+    cta: 'Noch Fragen?',
+    title: 'Persönliche Rückmeldung',
+    intro:
+      'Haben Sie eine Frage, die hier nicht beantwortet wurde? Schreiben Sie uns – wir melden uns vertraulich bei Ihnen.',
+    name: 'Name',
+    email: 'E-Mail-Adresse',
+    phone: 'Telefonnummer',
+    message: 'Ihre Nachricht',
+    placeholderMessage: 'Wobei können wir Sie unterstützen?',
+    consentBefore: 'Ich stimme zu, dass meine Angaben zur Bearbeitung der Anfrage verarbeitet werden. Hinweise in der ',
+    consentLink: 'Datenschutzerklärung',
+    submit: 'Nachricht senden',
+    submitting: 'Wird sicher übermittelt…',
+    successTitle: 'Nachricht eingegangen',
+    successText: 'Vielen Dank. Wir prüfen Ihre Nachricht und melden uns persönlich bei Ihnen.',
+    errorGeneric: 'Übermittlung fehlgeschlagen. Bitte versuchen Sie es in wenigen Minuten erneut.',
+    back: 'Weitere Nachricht senden',
+    cancel: 'Schließen',
   },
   security: {
     eyebrow: 'DATENSCHUTZ',
@@ -171,14 +263,20 @@ export const energyLandingContent = {
     ],
   },
   finalCta: {
-    title: 'Jetzt persönliche Energieprüfung anfragen',
-    text: 'Starten Sie die kostenlose Prüfung Ihrer aktuellen Energieverträge und erhalten Sie eine persönliche Rückmeldung.',
+    eyebrow: 'JETZT STARTEN',
+    title: 'Jetzt persönliche\nEnergieprüfung anfragen',
+    text: 'Laden Sie Ihre Unterlagen sicher hoch und erhalten Sie eine verständliche persönliche Einschätzung.',
     button: 'Persönliche Prüfung starten',
     trust:
       'Persönlicher Ansprechpartner · Vertrauliche Bearbeitung · Keine Tarifmaschine',
+    trustItems: [
+      { id: 'concierge' as const, label: 'Persönlicher Ansprechpartner' },
+      { id: 'confidential' as const, label: 'Vertrauliche Verarbeitung' },
+      { id: 'no-auto' as const, label: 'Keine automatische Tarifentscheidung' },
+    ],
   },
   stickyMobile: {
-    label: 'Persönliche Prüfung starten',
+    label: 'Persönliche Beratung anfragen',
   },
   categorySelector: {
     strom: { label: 'Strom', hint: 'Haushalt' },
