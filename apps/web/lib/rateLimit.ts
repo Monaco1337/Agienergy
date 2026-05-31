@@ -11,6 +11,8 @@ interface Limit {
 const LIMITS: Record<string, Limit> = {
   default: { capacity: 60, refillPerMinute: 60 },
   funnel: { capacity: 8, refillPerMinute: 4 }, // strenger
+  /** Landing-Lead-Formular (Hero / Themen-Seiten) */
+  lead: { capacity: 8, refillPerMinute: 4 },
   events: { capacity: 240, refillPerMinute: 240 },
   /** FAQ-Kontakt & ähnliche Formulare */
   contact: { capacity: 10, refillPerMinute: 6 },

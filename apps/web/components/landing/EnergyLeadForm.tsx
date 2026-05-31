@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Button, Checkbox, Field, GlassCard } from '@elo/ui';
 import { energyLandingContent } from '@/data/energyLandingContent';
 import { validateLeadForm, toLeadPayload } from '@/lib/leadValidation';
-import { leadMockSubmit } from '@/lib/leadMockSubmit';
+import { submitLandingLead } from '@/lib/leadSubmit';
 import { ENERGY_LEAD_FORM_ID } from '@/lib/scrollToEnergyForm';
 import type { LeadCategory, LeadFormErrors, SubmitStatus } from '@/types/lead';
 import { CategorySelector } from './CategorySelector';
@@ -93,7 +93,7 @@ export function EnergyLeadForm({
     }
     setStatus('submitting');
     try {
-      await leadMockSubmit(payload);
+      await submitLandingLead(payload);
       setStatus('success');
     } catch {
       setStatus('error');

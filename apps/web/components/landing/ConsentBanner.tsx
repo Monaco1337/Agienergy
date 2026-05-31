@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
 
 const COOKIE = 'elo_consent';
 const VERSION = '2025-01-01';
@@ -18,12 +19,15 @@ function write(value: string) {
 
 export function ConsentBanner() {
   const [show, setShow] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     const v = read();
     if (!v || !v.startsWith(VERSION)) setShow(true);
   }, []);
 
+  // Admin-Bereich ist ein internes Tool – kein Besucher-Consent-Banner.
+  if (pathname?.startsWith('/admin')) return null;
   if (!show) return null;
 
   return (

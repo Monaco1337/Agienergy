@@ -82,7 +82,7 @@ export default async function LeadsPage({ searchParams }: PageProps) {
       <FilterTabs current={colors} />
 
       {/* Desktop-Tabelle */}
-      <div className="hidden lg:block bg-card border border-line rounded-eloLg overflow-hidden">
+      <div className="hidden lg:block bg-card border border-line rounded-eloLg overflow-hidden shadow-eloSm">
         <table className="w-full text-[14px]">
           <thead className="bg-paper2/50 text-muted border-b border-line">
             <tr className="text-left">
