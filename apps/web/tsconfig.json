@@ -32,6 +32,6 @@
     "test-results",
     "tailwind.config.ts",
     "postcss.config.js",
-    "scripts/screenshots.ts"
+    "scripts"
   ]
 }
