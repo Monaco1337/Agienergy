@@ -4,3 +4,7 @@ export * from './audit';
 export * from './admin';
 export * from './event';
 export * from './funnel';
+export * from './partner';
+export * from './task';
+export * from './deal';
+export * from './commission';

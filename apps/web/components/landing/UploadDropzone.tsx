@@ -29,8 +29,12 @@ export function UploadDropzone({ file, onFile, error, disabled }: UploadDropzone
     onFile(list[0]!);
   };
 
+  const openPicker = () => {
+    if (!disabled) inputRef.current?.click();
+  };
+
   return (
-    <div>
+    <div className="upload-attach">
       <input
         ref={inputRef}
         type="file"
@@ -43,16 +47,7 @@ export function UploadDropzone({ file, onFile, error, disabled }: UploadDropzone
       {!file ? (
         <div
           role="group"
-          tabIndex={0}
-          aria-label={copy.uploadHeadline}
-          onKeyDown={(e) => {
-            if (disabled) return;
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault();
-              inputRef.current?.click();
-            }
-          }}
-          onClick={() => !disabled && inputRef.current?.click()}
+          aria-label={`${copy.uploadHeadline} (${copy.uploadOptional})`}
           onDragEnter={(e) => {
             e.preventDefault();
             if (!disabled) setDrag(true);
@@ -69,58 +64,71 @@ export function UploadDropzone({ file, onFile, error, disabled }: UploadDropzone
             pick(e.dataTransfer.files);
           }}
           className={cn(
-            'upload-dropzone w-full cursor-pointer rounded-2xl border border-dashed px-5 py-4 text-center transition-all min-h-[128px]',
-            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-white/90 focus-visible:ring-cyan',
-            disabled && 'opacity-50 cursor-not-allowed',
+            'upload-attach-row flex items-center gap-3 rounded-xl border px-3.5 py-2.5 transition-colors',
+            disabled && 'opacity-50 pointer-events-none',
             error
-              ? 'border-error/50 bg-error/[0.04]'
-              : 'border-borderLight bg-white/50 hover:border-cyan/40 hover:bg-white/70',
-            drag && !disabled && 'border-cyan bg-cyan/5 scale-[1.005] shadow-lift',
+              ? 'border-error/40 bg-error/[0.04]'
+              : drag
+                ? 'border-cyan/35 bg-cyan/[0.06]'
+                : 'border-white/[0.08] bg-white/[0.02] hover:border-white/[0.14] hover:bg-white/[0.04]',
           )}
         >
-          <div className="mx-auto mb-2 flex size-10 items-center justify-center rounded-full bg-cyan/10 text-cyanDeep pointer-events-none">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
-              <path
-                d="M12 16V4m0 0l-4 4m4-4l4 4M6 20h12"
-                stroke="currentColor"
-                strokeWidth="1.6"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
+          <span
+            aria-hidden
+            className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.03] text-slate"
+          >
+            <PaperclipIcon />
+          </span>
+
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+              <span className="upload-attach-optional rounded-md border border-white/10 bg-white/[0.04] px-1.5 py-px text-[10px] font-medium uppercase tracking-[0.12em] text-slate">
+                {copy.uploadOptional}
+              </span>
+              <span className="text-[13px] font-medium text-[rgba(245,250,255,0.88)] leading-tight">
+                {copy.uploadHeadline}
+              </span>
+            </div>
+            <p className="mt-0.5 text-[11.5px] leading-snug text-slate">
+              {copy.uploadHint}
+              <span className="text-slate/80"> · {copy.uploadBenefit}</span>
+            </p>
           </div>
-          <p className="text-[14.5px] font-semibold text-navy pointer-events-none leading-tight">
-            {copy.uploadHeadline}
-          </p>
-          <p className="mt-1 text-[12px] text-slate pointer-events-none leading-snug">
-            {copy.uploadHint}
-          </p>
-          <p className="mt-1.5 text-[12px] font-medium text-cyanDeep pointer-events-none">
-            Datei auswählen oder hierher ziehen
-          </p>
+
+          <button
+            type="button"
+            onClick={openPicker}
+            disabled={disabled}
+            className={cn(
+              'upload-attach-cta shrink-0 rounded-lg border px-3 py-1.5 text-[12px] font-medium transition-colors',
+              'border-white/10 bg-white/[0.04] text-[rgba(235,245,250,0.78)]',
+              'hover:border-cyan/30 hover:bg-cyan/[0.08] hover:text-cyan',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan/60 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent',
+            )}
+          >
+            {copy.uploadCta}
+          </button>
         </div>
       ) : (
-        <div className="upload-dropzone-filled rounded-2xl border border-borderLight bg-white/70 px-5 py-4 flex items-center gap-4">
-          <div className="flex size-11 items-center justify-center rounded-xl bg-cyan/10 text-cyanDeep shrink-0">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
-              <path
-                d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8m-5-5l5 5m-5-5v5h5"
-                stroke="currentColor"
-                strokeWidth="1.6"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </div>
-          <div className="flex-1 min-w-0 text-left">
-            <p className="text-[14.5px] font-semibold text-navy truncate">{file.name}</p>
-            <p className="text-[12.5px] text-slate">
-              {formatBytes(file.size)} · vertraulich übermittelt
-            </p>
+        <div
+          className={cn(
+            'upload-attach-filled flex items-center gap-3 rounded-xl border px-3.5 py-2.5',
+            'border-cyan/20 bg-cyan/[0.05]',
+          )}
+        >
+          <span
+            aria-hidden
+            className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-cyan/20 bg-cyan/10 text-cyanDeep"
+          >
+            <DocIcon />
+          </span>
+          <div className="min-w-0 flex-1 text-left">
+            <p className="truncate text-[13px] font-medium text-[rgba(245,250,255,0.92)]">{file.name}</p>
+            <p className="text-[11.5px] text-slate">{formatBytes(file.size)} · angehängt</p>
           </div>
           <button
             type="button"
-            className="text-[12.5px] font-medium text-slate hover:text-error transition-colors shrink-0"
+            className="shrink-0 text-[11.5px] font-medium text-slate transition-colors hover:text-error"
             disabled={disabled}
             onClick={() => {
               onFile(null);
@@ -133,10 +141,38 @@ export function UploadDropzone({ file, onFile, error, disabled }: UploadDropzone
       )}
 
       {error && (
-        <p id="upload-dropzone-error" className="mt-2 text-[13px] text-error" role="alert">
+        <p id="upload-dropzone-error" className="mt-1.5 text-[12px] text-error" role="alert">
           {error}
         </p>
       )}
     </div>
+  );
+}
+
+function PaperclipIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <path
+        d="M21.44 11.05l-8.49 8.49a5.5 5.5 0 01-7.78-7.78l9.19-9.19a3.5 3.5 0 014.95 4.95l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function DocIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <path
+        d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8m-5-5l5 5m-5-5v5h5"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
   );
 }

@@ -1,9 +1,223 @@
 {
   "leads": [
     {
+      "id": "lead_d45e5091-4c16-4c68-8b44-7b0142e12df3",
+      "createdAt": "2026-05-15T17:19:24.856Z",
+      "updatedAt": "2026-06-08T18:00:52.343Z",
+      "source": "website",
+      "customerType": "private",
+      "interests": [
+        "unknown"
+      ],
+      "urgency": "information",
+      "hasInvoice": "unknown",
+      "monthlyEnergyCosts": "unknown",
+      "ownsProperty": "unknown",
+      "firstName": "Karl",
+      "lastName": "Test",
+      "email": "karl@example.com",
+      "postalCode": "20095",
+      "legalBasis": "consent",
+      "consent": {
+        "contactConsent": true,
+        "privacyAccepted": true,
+        "consentTextVersion": "2025-01-01",
+        "consentTimestamp": "2026-05-15T17:19:24.856Z",
+        "source": "seed"
+      },
+      "leadScore": 0,
+      "leadColor": "gray",
+      "leadLabel": "Niedrige Priorität",
+      "scoreReasons": [
+        {
+          "code": "urgency_information",
+          "label": "Nur Informationsphase",
+          "delta": -15
+        },
+        {
+          "code": "postal_code",
+          "label": "Postleitzahl vorhanden",
+          "delta": 10
+        }
+      ],
+      "recommendedAction": "Nicht priorisieren. Es fehlen wichtige Angaben (z.B. Telefon, Dringlichkeit oder Verbrauch).",
+      "status": "Priorisiert",
+      "notes": [],
+      "contactHistory": [],
+      "files": [],
+      "isDemo": true,
+      "assignedPartnerId": "prt_8ccc0228-2371-40d1-83d6-f1856ca937d2",
+      "assignedAt": "2026-06-08T18:00:52.342Z"
+    },
+    {
+      "id": "lead_25a29812-8f26-46d9-86be-24b4521b596d",
+      "createdAt": "2026-05-15T17:19:24.854Z",
+      "updatedAt": "2026-06-02T14:05:52.128Z",
+      "source": "website",
+      "customerType": "business",
+      "interests": [
+        "strom_gas"
+      ],
+      "urgency": "weeks",
+      "hasInvoice": "later",
+      "monthlyEnergyCosts": "200_400",
+      "ownsProperty": "business_property",
+      "contactPreference": "phone",
+      "firstName": "Bäckerei",
+      "lastName": "Müller GmbH",
+      "phone": "+49 89 7654321",
+      "email": "kontakt@baeckerei-mueller.example",
+      "postalCode": "80331",
+      "city": "München",
+      "legalBasis": "consent",
+      "consent": {
+        "contactConsent": true,
+        "privacyAccepted": true,
+        "consentTextVersion": "2025-01-01",
+        "consentTimestamp": "2026-05-15T17:19:24.854Z",
+        "source": "seed"
+      },
+      "leadScore": 120,
+      "leadColor": "red",
+      "leadLabel": "Sofort-Abschluss möglich",
+      "scoreReasons": [
+        {
+          "code": "business",
+          "label": "Gewerbekunde",
+          "delta": 35
+        },
+        {
+          "code": "strom_gas_combo",
+          "label": "Strom und Gas kombiniert",
+          "delta": 20
+        },
+        {
+          "code": "invoice_later",
+          "label": "Rechnung wird nachgereicht",
+          "delta": 15
+        },
+        {
+          "code": "urgency_weeks",
+          "label": "Entscheidung in den nächsten Wochen",
+          "delta": 20
+        },
+        {
+          "code": "cost_200_400",
+          "label": "Hohe monatliche Energiekosten",
+          "delta": 25
+        },
+        {
+          "code": "phone_present",
+          "label": "Telefonnummer vorhanden",
+          "delta": 20
+        },
+        {
+          "code": "prefers_phone",
+          "label": "Telefonische Kontaktaufnahme bevorzugt",
+          "delta": 20
+        },
+        {
+          "code": "postal_code",
+          "label": "Postleitzahl vorhanden",
+          "delta": 10
+        }
+      ],
+      "recommendedAction": "Innerhalb von 15 Minuten anrufen. Gewerbekunde mit Interesse an Strom und Gas, gewerbekunde, strom und gas kombiniert, rechnung wird nachgereicht.",
+      "status": "Abgeschlossen",
+      "notes": [],
+      "contactHistory": [],
+      "files": [],
+      "isDemo": true,
+      "assignedPartnerId": "prt_8ccc0228-2371-40d1-83d6-f1856ca937d2",
+      "assignedAt": "2026-06-02T14:05:52.118Z",
+      "closedAt": "2026-06-02T14:05:52.128Z"
+    },
+    {
+      "id": "lead_e3b96760-2643-4ff3-85dc-ee4ec7846566",
+      "createdAt": "2026-05-15T17:19:24.851Z",
+      "updatedAt": "2026-06-02T14:05:52.120Z",
+      "source": "website",
+      "customerType": "home_owner",
+      "interests": [
+        "photovoltaik"
+      ],
+      "urgency": "immediate",
+      "hasInvoice": "upload_now",
+      "monthlyEnergyCosts": "over_400",
+      "ownsProperty": "yes",
+      "contactPreference": "phone",
+      "firstName": "Anna",
+      "lastName": "Berger",
+      "phone": "+49 30 1234567",
+      "email": "anna.berger@example.com",
+      "postalCode": "10115",
+      "city": "Berlin",
+      "legalBasis": "consent",
+      "consent": {
+        "contactConsent": true,
+        "privacyAccepted": true,
+        "consentTextVersion": "2025-01-01",
+        "consentTimestamp": "2026-05-15T17:19:24.851Z",
+        "source": "seed"
+      },
+      "leadScore": 120,
+      "leadColor": "red",
+      "leadLabel": "Sofort-Abschluss möglich",
+      "scoreReasons": [
+        {
+          "code": "pv_interest",
+          "label": "Photovoltaik-Interesse erkannt",
+          "delta": 25
+        },
+        {
+          "code": "home_owner",
+          "label": "Hauseigentümer mit potenzieller Dachfläche",
+          "delta": 30
+        },
+        {
+          "code": "invoice_upload",
+          "label": "Rechnung wird hochgeladen",
+          "delta": 35
+        },
+        {
+          "code": "urgency_immediate",
+          "label": "Schnelle Wechselabsicht",
+          "delta": 30
+        },
+        {
+          "code": "cost_over_400",
+          "label": "Sehr hohe monatliche Energiekosten",
+          "delta": 35
+        },
+        {
+          "code": "phone_present",
+          "label": "Telefonnummer vorhanden",
+          "delta": 20
+        },
+        {
+          "code": "prefers_phone",
+          "label": "Telefonische Kontaktaufnahme bevorzugt",
+          "delta": 20
+        },
+        {
+          "code": "postal_code",
+          "label": "Postleitzahl vorhanden",
+          "delta": 10
+        }
+      ],
+      "recommendedAction": "Innerhalb von 15 Minuten anrufen. Eigentümer mit Interesse an Photovoltaik, photovoltaik-interesse erkannt, hauseigentümer mit potenzieller dachfläche, rechnung wird hochgeladen.",
+      "status": "Priorisiert",
+      "notes": [],
+      "contactHistory": [],
+      "files": [],
+      "isDemo": true,
+      "assignedPartnerId": "prt_33106ef6-600c-4e30-bb5b-70b261e02bf4",
+      "assignedAt": "2026-06-02T14:05:52.120Z"
+    },
+    {
       "id": "lead_6ae1e985-3653-4482-8a75-1c1053050677",
       "createdAt": "2026-05-08T20:41:04.432Z",
-      "updatedAt": "2026-05-08T20:41:04.432Z",
+      "updatedAt": "2026-06-02T14:05:52.122Z",
       "source": "website",
       "customerType": "private",
       "interests": [
@@ -41,16 +255,18 @@
         }
       ],
       "recommendedAction": "Nicht priorisieren. Es fehlen wichtige Angaben (z.B. Telefon, Dringlichkeit oder Verbrauch).",
-      "status": "Neu",
+      "status": "Priorisiert",
       "notes": [],
       "contactHistory": [],
       "files": [],
-      "isDemo": true
+      "isDemo": true,
+      "assignedPartnerId": "prt_9015dcae-4103-4c5e-8bfb-5a3401e65e50",
+      "assignedAt": "2026-06-02T14:05:52.121Z"
     },
     {
       "id": "lead_8dea2ab8-62c9-4ca6-ab31-a55ac71171d2",
       "createdAt": "2026-05-08T20:41:04.432Z",
-      "updatedAt": "2026-05-08T20:41:04.432Z",
+      "updatedAt": "2026-06-02T14:05:52.123Z",
       "source": "website",
       "customerType": "business",
       "interests": [
@@ -121,16 +337,18 @@
         }
       ],
       "recommendedAction": "Innerhalb von 15 Minuten anrufen. Gewerbekunde mit Interesse an Strom und Gas, gewerbekunde, strom und gas kombiniert, rechnung wird nachgereicht.",
-      "status": "Neu",
+      "status": "Priorisiert",
       "notes": [],
       "contactHistory": [],
       "files": [],
-      "isDemo": true
+      "isDemo": true,
+      "assignedPartnerId": "prt_8ccc0228-2371-40d1-83d6-f1856ca937d2",
+      "assignedAt": "2026-06-02T14:05:52.123Z"
     },
     {
       "id": "lead_cae21076-d4b0-4273-8c25-5fc3caef095b",
       "createdAt": "2026-05-08T20:41:04.431Z",
-      "updatedAt": "2026-05-08T20:41:04.431Z",
+      "updatedAt": "2026-06-02T14:05:52.125Z",
       "source": "website",
       "customerType": "home_owner",
       "interests": [
@@ -201,15 +419,251 @@
         }
       ],
       "recommendedAction": "Innerhalb von 15 Minuten anrufen. Eigentümer mit Interesse an Photovoltaik, photovoltaik-interesse erkannt, hauseigentümer mit potenzieller dachfläche, rechnung wird hochgeladen.",
-      "status": "Neu",
+      "status": "Priorisiert",
       "notes": [],
       "contactHistory": [],
       "files": [],
-      "isDemo": true
+      "isDemo": true,
+      "assignedPartnerId": "prt_33106ef6-600c-4e30-bb5b-70b261e02bf4",
+      "assignedAt": "2026-06-02T14:05:52.124Z"
     }
   ],
   "research": [],
   "audit": [
+    {
+      "id": "aud_40e363ec-46f2-4015-b8e0-5f2ea60cbdd5",
+      "createdAt": "2026-06-08T18:00:52.349Z",
+      "actorId": "usr_b6c1b82f-13e0-43a2-ad5f-46bb3ff7d421",
+      "actorRole": "admin",
+      "action": "lead.assigned",
+      "entity": "lead",
+      "entityId": "lead_d45e5091-4c16-4c68-8b44-7b0142e12df3",
+      "diff": {
+        "assignedPartnerId": {
+          "to": "prt_8ccc0228-2371-40d1-83d6-f1856ca937d2"
+        },
+        "assignedAt": {
+          "to": "2026-06-08T18:00:52.342Z"
+        }
+      }
+    },
+    {
+      "id": "aud_47cfa1f1-c646-4a3c-95f0-b9009716da15",
+      "createdAt": "2026-06-08T18:00:42.736Z",
+      "actorId": "usr_b6c1b82f-13e0-43a2-ad5f-46bb3ff7d421",
+      "actorRole": "admin",
+      "action": "lead.unassigned",
+      "entity": "lead",
+      "entityId": "lead_d45e5091-4c16-4c68-8b44-7b0142e12df3",
+      "diff": {
+        "assignedPartnerId": {
+          "from": "prt_9015dcae-4103-4c5e-8bfb-5a3401e65e50"
+        },
+        "assignedAt": {
+          "from": "2026-06-02T14:05:52.117Z"
+        }
+      }
+    },
+    {
+      "id": "aud_d0c76ac0-0585-4f75-b142-aa7bb0a3fa4b",
+      "createdAt": "2026-06-08T17:59:22.357Z",
+      "actorId": "usr_b6c1b82f-13e0-43a2-ad5f-46bb3ff7d421",
+      "actorRole": "admin",
+      "action": "auth.login_success",
+      "entity": "auth",
+      "entityId": "usr_b6c1b82f-13e0-43a2-ad5f-46bb3ff7d421",
+      "ipHash": "0e9e24923d14058eb32bcb85"
+    },
+    {
+      "id": "aud_f3a0620b-11fa-4cc6-87bb-c534f505dbbe",
+      "createdAt": "2026-06-08T16:56:59.057Z",
+      "actorId": "usr_b6c1b82f-13e0-43a2-ad5f-46bb3ff7d421",
+      "actorRole": "admin",
+      "action": "auth.login_success",
+      "entity": "auth",
+      "entityId": "usr_b6c1b82f-13e0-43a2-ad5f-46bb3ff7d421",
+      "ipHash": "0e9e24923d14058eb32bcb85"
+    },
+    {
+      "id": "aud_244d1ad8-7cc3-4b3c-96e2-3fe7545ba21a",
+      "createdAt": "2026-06-08T16:56:52.957Z",
+      "actorId": "usr_b6c1b82f-13e0-43a2-ad5f-46bb3ff7d421",
+      "actorRole": "admin",
+      "action": "auth.login_success",
+      "entity": "auth",
+      "entityId": "usr_b6c1b82f-13e0-43a2-ad5f-46bb3ff7d421",
+      "ipHash": "0e9e24923d14058eb32bcb85"
+    },
+    {
+      "id": "aud_3a69b81a-a1e1-4479-9030-d346b0e7911a",
+      "createdAt": "2026-06-08T16:56:28.384Z",
+      "actorId": "usr_b6c1b82f-13e0-43a2-ad5f-46bb3ff7d421",
+      "actorRole": "admin",
+      "action": "auth.login_success",
+      "entity": "auth",
+      "entityId": "usr_b6c1b82f-13e0-43a2-ad5f-46bb3ff7d421",
+      "ipHash": "0e9e24923d14058eb32bcb85"
+    },
+    {
+      "id": "aud_33c7fff2-9107-4ebd-8a47-d876fc46b0a8",
+      "createdAt": "2026-06-02T14:16:59.040Z",
+      "actorId": "usr_b6c1b82f-13e0-43a2-ad5f-46bb3ff7d421",
+      "actorRole": "admin",
+      "action": "auth.login_success",
+      "entity": "auth",
+      "entityId": "usr_b6c1b82f-13e0-43a2-ad5f-46bb3ff7d421",
+      "ipHash": "0e9e24923d14058eb32bcb85"
+    },
+    {
+      "id": "aud_a9857d21-2cc0-40a9-98cd-d462d66266b5",
+      "createdAt": "2026-06-02T14:14:19.120Z",
+      "actorId": "usr_b6c1b82f-13e0-43a2-ad5f-46bb3ff7d421",
+      "actorRole": "admin",
+      "action": "auth.login_success",
+      "entity": "auth",
+      "entityId": "usr_b6c1b82f-13e0-43a2-ad5f-46bb3ff7d421",
+      "ipHash": "0e9e24923d14058eb32bcb85"
+    },
+    {
+      "id": "aud_266cb9a4-5078-422a-9ee4-2dd96dcfb096",
+      "createdAt": "2026-06-02T14:13:57.188Z",
+      "actorId": "usr_b6c1b82f-13e0-43a2-ad5f-46bb3ff7d421",
+      "actorRole": "admin",
+      "action": "auth.login_success",
+      "entity": "auth",
+      "entityId": "usr_b6c1b82f-13e0-43a2-ad5f-46bb3ff7d421",
+      "ipHash": "0e9e24923d14058eb32bcb85"
+    },
+    {
+      "id": "aud_c65c27a0-2683-48ec-840d-57159239db4e",
+      "createdAt": "2026-06-02T13:09:34.024Z",
+      "actorId": "usr_b6c1b82f-13e0-43a2-ad5f-46bb3ff7d421",
+      "actorRole": "admin",
+      "action": "auth.login_success",
+      "entity": "auth",
+      "entityId": "usr_b6c1b82f-13e0-43a2-ad5f-46bb3ff7d421",
+      "ipHash": "0e9e24923d14058eb32bcb85"
+    },
+    {
+      "id": "aud_aaf350ed-d256-4d9f-bc5f-b77ce11c1dcd",
+      "createdAt": "2026-06-02T13:09:08.101Z",
+      "actorId": "usr_b6c1b82f-13e0-43a2-ad5f-46bb3ff7d421",
+      "actorRole": "admin",
+      "action": "auth.login_success",
+      "entity": "auth",
+      "entityId": "usr_b6c1b82f-13e0-43a2-ad5f-46bb3ff7d421",
+      "ipHash": "0e9e24923d14058eb32bcb85"
+    },
+    {
+      "id": "aud_4f060c51-a7f4-44b8-89f3-fc1d89d4e26b",
+      "createdAt": "2026-06-02T13:09:06.489Z",
+      "actorId": "usr_b6c1b82f-13e0-43a2-ad5f-46bb3ff7d421",
+      "actorRole": "admin",
+      "action": "auth.login_success",
+      "entity": "auth",
+      "entityId": "usr_b6c1b82f-13e0-43a2-ad5f-46bb3ff7d421",
+      "ipHash": "0e9e24923d14058eb32bcb85"
+    },
+    {
+      "id": "aud_c831363e-440d-45b2-a87e-0e5b6fdeeedf",
+      "createdAt": "2026-05-31T17:26:06.421Z",
+      "actorId": "usr_b6c1b82f-13e0-43a2-ad5f-46bb3ff7d421",
+      "actorRole": "admin",
+      "action": "auth.login_success",
+      "entity": "auth",
+      "entityId": "usr_b6c1b82f-13e0-43a2-ad5f-46bb3ff7d421",
+      "ipHash": "0e9e24923d14058eb32bcb85"
+    },
+    {
+      "id": "aud_711e68c5-38d7-4a83-8b7e-104e1b42d903",
+      "createdAt": "2026-05-31T17:11:52.535Z",
+      "actorId": "usr_b6c1b82f-13e0-43a2-ad5f-46bb3ff7d421",
+      "actorRole": "admin",
+      "action": "auth.login_success",
+      "entity": "auth",
+      "entityId": "usr_b6c1b82f-13e0-43a2-ad5f-46bb3ff7d421",
+      "ipHash": "0e9e24923d14058eb32bcb85"
+    },
+    {
+      "id": "aud_88d39b6e-643b-44cd-a2d3-b389ec49fba3",
+      "createdAt": "2026-05-31T17:10:48.409Z",
+      "actorId": "usr_b6c1b82f-13e0-43a2-ad5f-46bb3ff7d421",
+      "actorRole": "admin",
+      "action": "auth.login_success",
+      "entity": "auth",
+      "entityId": "usr_b6c1b82f-13e0-43a2-ad5f-46bb3ff7d421",
+      "ipHash": "0e9e24923d14058eb32bcb85"
+    },
+    {
+      "id": "aud_b5daf0d5-7f10-47da-83b7-10493bb47b37",
+      "createdAt": "2026-05-31T17:02:24.985Z",
+      "actorId": "usr_b6c1b82f-13e0-43a2-ad5f-46bb3ff7d421",
+      "actorRole": "admin",
+      "action": "auth.login_success",
+      "entity": "auth",
+      "entityId": "usr_b6c1b82f-13e0-43a2-ad5f-46bb3ff7d421",
+      "ipHash": "0e9e24923d14058eb32bcb85"
+    },
+    {
+      "id": "aud_aa5ccb20-033a-4b5b-9608-1f0b8aecc3c2",
+      "createdAt": "2026-05-31T17:01:24.014Z",
+      "actorId": "usr_b6c1b82f-13e0-43a2-ad5f-46bb3ff7d421",
+      "actorRole": "admin",
+      "action": "auth.login_success",
+      "entity": "auth",
+      "entityId": "usr_b6c1b82f-13e0-43a2-ad5f-46bb3ff7d421",
+      "ipHash": "0e9e24923d14058eb32bcb85"
+    },
+    {
+      "id": "aud_3ae9a843-a34e-48ca-91d8-24e72fcafe5f",
+      "createdAt": "2026-05-31T16:49:25.186Z",
+      "actorId": "usr_b6c1b82f-13e0-43a2-ad5f-46bb3ff7d421",
+      "actorRole": "admin",
+      "action": "auth.login_success",
+      "entity": "auth",
+      "entityId": "usr_b6c1b82f-13e0-43a2-ad5f-46bb3ff7d421",
+      "ipHash": "0e9e24923d14058eb32bcb85"
+    },
+    {
+      "id": "aud_ec89fb28-3790-46de-9c26-b1bef7b99e24",
+      "createdAt": "2026-05-25T12:05:52.452Z",
+      "actorId": "usr_b6c1b82f-13e0-43a2-ad5f-46bb3ff7d421",
+      "actorRole": "admin",
+      "action": "auth.login_success",
+      "entity": "auth",
+      "entityId": "usr_b6c1b82f-13e0-43a2-ad5f-46bb3ff7d421",
+      "ipHash": "0e9e24923d14058eb32bcb85"
+    },
+    {
+      "id": "aud_affac2dc-c05e-4a4e-897b-a6754d7f3e3f",
+      "createdAt": "2026-05-25T11:57:14.485Z",
+      "actorId": "usr_b6c1b82f-13e0-43a2-ad5f-46bb3ff7d421",
+      "actorRole": "admin",
+      "action": "auth.login_success",
+      "entity": "auth",
+      "entityId": "usr_b6c1b82f-13e0-43a2-ad5f-46bb3ff7d421",
+      "ipHash": "0e9e24923d14058eb32bcb85"
+    },
+    {
+      "id": "aud_74c2d873-3257-4c34-ae88-a9d4eb6e89d4",
+      "createdAt": "2026-05-25T11:41:12.094Z",
+      "actorId": "usr_b6c1b82f-13e0-43a2-ad5f-46bb3ff7d421",
+      "actorRole": "admin",
+      "action": "auth.login_success",
+      "entity": "auth",
+      "entityId": "usr_b6c1b82f-13e0-43a2-ad5f-46bb3ff7d421",
+      "ipHash": "0e9e24923d14058eb32bcb85"
+    },
+    {
+      "id": "aud_a5425866-ba26-4762-9635-05e396fd7a6b",
+      "createdAt": "2026-05-25T11:31:34.069Z",
+      "actorId": "usr_b6c1b82f-13e0-43a2-ad5f-46bb3ff7d421",
+      "actorRole": "admin",
+      "action": "auth.login_success",
+      "entity": "auth",
+      "entityId": "usr_b6c1b82f-13e0-43a2-ad5f-46bb3ff7d421",
+      "ipHash": "0e9e24923d14058eb32bcb85"
+    },
     {
       "id": "aud_f863ae23-560a-438a-a1d4-4d8cf9f0c0ba",
       "createdAt": "2026-05-11T11:25:53.221Z",
@@ -290,8 +744,145 @@
       "passwordHash": "$argon2id$v=19$m=19456,t=2,p=1$32F7/wnasDHPJRTB76uRYg$1L3OSbhMLjs5rOUPb1MZ7mrJM3w3htNqLOYzL6MlOI4",
       "createdAt": "2026-05-08T20:41:04.429Z",
       "failedLoginCount": 0,
-      "lastLoginAt": "2026-05-11T11:25:53.208Z"
+      "lastLoginAt": "2026-06-08T17:59:22.349Z"
     }
   ],
-  "events": []
+  "events": [],
+  "partners": [
+    {
+      "id": "prt_9015dcae-4103-4c5e-8bfb-5a3401e65e50",
+      "createdAt": "2026-06-02T14:05:52.115Z",
+      "updatedAt": "2026-06-02T14:05:52.115Z",
+      "name": "Demo · Nord Gewerbe Pro",
+      "email": "nord@partner.demo",
+      "phone": "+49 40 0000333",
+      "regionLabel": "Hamburg / Norddeutschland",
+      "regionPrefixes": [
+        "20",
+        "21",
+        "22",
+        "24"
+      ],
+      "specialties": [
+        "gewerbe",
+        "strom_gas"
+      ],
+      "capacity": 12,
+      "status": "paused",
+      "routingWeight": 3,
+      "isDemo": true
+    },
+    {
+      "id": "prt_8ccc0228-2371-40d1-83d6-f1856ca937d2",
+      "createdAt": "2026-06-02T14:05:52.113Z",
+      "updatedAt": "2026-06-02T14:05:52.113Z",
+      "name": "Demo · Süd Solar GmbH",
+      "email": "sued@partner.demo",
+      "phone": "+49 89 0000222",
+      "regionLabel": "Bayern / München",
+      "regionPrefixes": [
+        "80",
+        "81",
+        "82",
+        "83",
+        "84",
+        "85"
+      ],
+      "specialties": [
+        "photovoltaik",
+        "strom"
+      ],
+      "capacity": 18,
+      "status": "active",
+      "routingWeight": 5,
+      "isDemo": true
+    },
+    {
+      "id": "prt_33106ef6-600c-4e30-bb5b-70b261e02bf4",
+      "createdAt": "2026-06-02T14:05:52.105Z",
+      "updatedAt": "2026-06-02T14:05:52.107Z",
+      "name": "Demo · Berlin Energie Team",
+      "email": "berlin@partner.demo",
+      "phone": "+49 30 0000111",
+      "regionLabel": "Berlin / Brandenburg",
+      "regionPrefixes": [
+        "10",
+        "11",
+        "12",
+        "13",
+        "14",
+        "15"
+      ],
+      "specialties": [
+        "strom",
+        "gas",
+        "strom_gas"
+      ],
+      "capacity": 25,
+      "status": "active",
+      "routingWeight": 8,
+      "isDemo": true
+    }
+  ],
+  "tasks": [
+    {
+      "id": "tsk_da0dd52f-7c96-46de-87e1-e7191ace9365",
+      "createdAt": "2026-06-02T14:05:52.132Z",
+      "updatedAt": "2026-06-02T14:05:52.132Z",
+      "title": "Demo · Karl Test – Unterlagen anfordern",
+      "description": "Letzte Stromrechnung anfordern, dann scoring nochmal prüfen.",
+      "kind": "document",
+      "status": "waiting",
+      "priority": "normal",
+      "leadId": "lead_d45e5091-4c16-4c68-8b44-7b0142e12df3",
+      "partnerId": "prt_9015dcae-4103-4c5e-8bfb-5a3401e65e50",
+      "ownerId": "demo-seed",
+      "createdBy": "demo-seed"
+    },
+    {
+      "id": "tsk_b9ab9cf3-386e-495c-a9cc-bc9f21b6d964",
+      "createdAt": "2026-06-02T14:05:52.132Z",
+      "updatedAt": "2026-06-02T14:05:52.132Z",
+      "title": "Demo · Anna Berger heute zurückrufen",
+      "description": "Photovoltaik-Beratung. Hat Rechnung hochgeladen, möglichst zeitnah anrufen.",
+      "kind": "call",
+      "status": "today",
+      "priority": "urgent",
+      "leadId": "lead_e3b96760-2643-4ff3-85dc-ee4ec7846566",
+      "partnerId": "prt_33106ef6-600c-4e30-bb5b-70b261e02bf4",
+      "ownerId": "demo-seed",
+      "createdBy": "demo-seed",
+      "dueAt": "2026-06-02T15:05:52.132Z"
+    }
+  ],
+  "deals": [
+    {
+      "id": "deal_a0e31abc-e5b0-4c3c-8f93-6c083a35aed9",
+      "createdAt": "2026-06-02T14:05:52.126Z",
+      "updatedAt": "2026-06-02T14:05:52.126Z",
+      "leadId": "lead_25a29812-8f26-46d9-86be-24b4521b596d",
+      "partnerId": "prt_8ccc0228-2371-40d1-83d6-f1856ca937d2",
+      "product": "photovoltaik",
+      "productLabel": "PV 8 kWp + Speicher",
+      "status": "confirmed",
+      "value": 18400,
+      "expectedCommission": 920,
+      "notes": "Demo-Abschluss · 8 kWp Anlage inkl. Speicher.",
+      "closedAt": "2026-06-02T14:05:52.126Z",
+      "reportedBy": "demo-seed",
+      "reviewedBy": "demo-seed"
+    }
+  ],
+  "commissions": [
+    {
+      "id": "com_64af95a9-6bf2-42cf-b546-6c26fed4429f",
+      "createdAt": "2026-06-02T14:05:52.130Z",
+      "updatedAt": "2026-06-02T14:05:52.130Z",
+      "dealId": "deal_a0e31abc-e5b0-4c3c-8f93-6c083a35aed9",
+      "partnerId": "prt_8ccc0228-2371-40d1-83d6-f1856ca937d2",
+      "amount": 920,
+      "currency": "EUR",
+      "status": "pending"
+    }
+  ]
 }

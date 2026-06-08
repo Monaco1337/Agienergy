@@ -13,9 +13,10 @@ export interface LeadPayload {
   phone: string;
   email: string;
   zip: string;
-  fileName: string;
-  fileType: string;
-  fileSize: number;
+  annualConsumptionKwh?: number;
+  fileName?: string;
+  fileType?: string;
+  fileSize?: number;
   consent: boolean;
   source: 'landingpage-hero';
   createdAt: string;
@@ -27,6 +28,7 @@ export interface LeadFormErrors {
   phone?: string;
   email?: string;
   zip?: string;
+  annualConsumptionKwh?: string;
   file?: string;
   consent?: string;
   general?: string;

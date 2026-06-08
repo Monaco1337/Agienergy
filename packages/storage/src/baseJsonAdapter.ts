@@ -7,8 +7,23 @@ import type {
   AdminUser,
   UserId,
   FunnelEvent,
+  Partner,
+  PartnerId,
+  Task,
+  TaskId,
+  Deal,
+  DealId,
+  Commission,
+  CommissionId,
 } from '@elo/core';
-import type { StorageAdapter, LeadFilter } from './types';
+import type {
+  StorageAdapter,
+  LeadFilter,
+  PartnerFilter,
+  TaskFilter,
+  DealFilter,
+  CommissionFilter,
+} from './types';
 
 export interface DbShape {
   leads: Lead[];
@@ -16,10 +31,24 @@ export interface DbShape {
   audit: AuditEntry[];
   users: AdminUser[];
   events: FunnelEvent[];
+  partners: Partner[];
+  tasks: Task[];
+  deals: Deal[];
+  commissions: Commission[];
 }
 
 export function emptyDb(): DbShape {
-  return { leads: [], research: [], audit: [], users: [], events: [] };
+  return {
+    leads: [],
+    research: [],
+    audit: [],
+    users: [],
+    events: [],
+    partners: [],
+    tasks: [],
+    deals: [],
+    commissions: [],
+  };
 }
 
 /**
@@ -50,6 +79,10 @@ export abstract class BaseJsonAdapter implements StorageAdapter {
         audit: parsed.audit ?? [],
         users: parsed.users ?? [],
         events: parsed.events ?? [],
+        partners: parsed.partners ?? [],
+        tasks: parsed.tasks ?? [],
+        deals: parsed.deals ?? [],
+        commissions: parsed.commissions ?? [],
       };
     } catch {
       return emptyDb();
@@ -70,6 +103,8 @@ export abstract class BaseJsonAdapter implements StorageAdapter {
     await this.writeQueue;
     return result;
   }
+
+  // ─── Leads ──────────────────────────────────────────────────────────────
 
   async createLead(lead: Lead): Promise<Lead> {
     return this.mutate((db) => {
@@ -94,6 +129,14 @@ export abstract class BaseJsonAdapter implements StorageAdapter {
     return db.leads.find((l) => l.id === id) ?? null;
   }
 
+  async deleteLead(id: LeadId): Promise<boolean> {
+    return this.mutate((db) => {
+      const before = db.leads.length;
+      db.leads = db.leads.filter((l) => l.id !== id);
+      return db.leads.length !== before;
+    });
+  }
+
   async listLeads(filter: LeadFilter = {}): Promise<Lead[]> {
     const db = await this.readDb();
     let result = db.leads;
@@ -107,6 +150,9 @@ export abstract class BaseJsonAdapter implements StorageAdapter {
     if (filter.postalCodePrefix)
       result = result.filter((l) => l.postalCode.startsWith(filter.postalCodePrefix!));
     if (filter.assignedTo) result = result.filter((l) => l.assignedTo === filter.assignedTo);
+    if (filter.assignedPartnerId)
+      result = result.filter((l) => l.assignedPartnerId === filter.assignedPartnerId);
+    if (filter.unassigned) result = result.filter((l) => !l.assignedPartnerId);
     if (filter.hasInvoice !== undefined) {
       result = result.filter((l) =>
         filter.hasInvoice
@@ -153,6 +199,8 @@ export abstract class BaseJsonAdapter implements StorageAdapter {
     );
   }
 
+  // ─── Research ───────────────────────────────────────────────────────────
+
   async createResearch(p: ResearchProspect): Promise<ResearchProspect> {
     return this.mutate((db) => {
       db.research.unshift(p);
@@ -181,6 +229,8 @@ export abstract class BaseJsonAdapter implements StorageAdapter {
     return db.research;
   }
 
+  // ─── Audit ──────────────────────────────────────────────────────────────
+
   async appendAudit(entry: AuditEntry): Promise<void> {
     await this.mutate((db) => {
       db.audit.unshift(entry);
@@ -194,10 +244,22 @@ export abstract class BaseJsonAdapter implements StorageAdapter {
     return db.audit.slice(0, limit);
   }
 
+  // ─── Users ──────────────────────────────────────────────────────────────
+
   async getUserByEmail(email: string): Promise<AdminUser | null> {
     const db = await this.readDb();
     const e = email.toLowerCase().trim();
     return db.users.find((u) => u.email.toLowerCase() === e) ?? null;
+  }
+
+  async getUser(id: UserId): Promise<AdminUser | null> {
+    const db = await this.readDb();
+    return db.users.find((u) => u.id === id) ?? null;
+  }
+
+  async listUsers(): Promise<AdminUser[]> {
+    const db = await this.readDb();
+    return db.users;
   }
 
   async upsertUser(user: AdminUser): Promise<AdminUser> {
@@ -220,6 +282,8 @@ export abstract class BaseJsonAdapter implements StorageAdapter {
     });
   }
 
+  // ─── Events ─────────────────────────────────────────────────────────────
+
   async appendEvent(event: FunnelEvent): Promise<void> {
     await this.mutate((db) => {
       db.events.unshift(event);
@@ -230,5 +294,164 @@ export abstract class BaseJsonAdapter implements StorageAdapter {
   async listEvents(limit = 5000): Promise<FunnelEvent[]> {
     const db = await this.readDb();
     return db.events.slice(0, limit);
+  }
+
+  // ─── Partner ────────────────────────────────────────────────────────────
+
+  async createPartner(p: Partner): Promise<Partner> {
+    return this.mutate((db) => {
+      db.partners.unshift(p);
+      return p;
+    });
+  }
+
+  async updatePartner(id: PartnerId, patch: Partial<Partner>): Promise<Partner | null> {
+    return this.mutate((db) => {
+      const idx = db.partners.findIndex((p) => p.id === id);
+      if (idx === -1) return null;
+      const existing = db.partners[idx]!;
+      const updated: Partner = { ...existing, ...patch, updatedAt: new Date().toISOString() };
+      db.partners[idx] = updated;
+      return updated;
+    });
+  }
+
+  async getPartner(id: PartnerId): Promise<Partner | null> {
+    const db = await this.readDb();
+    return db.partners.find((p) => p.id === id) ?? null;
+  }
+
+  async listPartners(filter: PartnerFilter = {}): Promise<Partner[]> {
+    const db = await this.readDb();
+    let result = db.partners;
+    if (filter.statuses?.length) result = result.filter((p) => filter.statuses!.includes(p.status));
+    if (filter.search) {
+      const q = filter.search.toLowerCase();
+      result = result.filter(
+        (p) =>
+          p.name.toLowerCase().includes(q) ||
+          p.email.toLowerCase().includes(q) ||
+          (p.regionLabel ?? '').toLowerCase().includes(q),
+      );
+    }
+    return result;
+  }
+
+  async deletePartner(id: PartnerId): Promise<boolean> {
+    return this.mutate((db) => {
+      const before = db.partners.length;
+      db.partners = db.partners.filter((p) => p.id !== id);
+      return db.partners.length !== before;
+    });
+  }
+
+  // ─── Tasks ──────────────────────────────────────────────────────────────
+
+  async createTask(t: Task): Promise<Task> {
+    return this.mutate((db) => {
+      db.tasks.unshift(t);
+      return t;
+    });
+  }
+
+  async updateTask(id: TaskId, patch: Partial<Task>): Promise<Task | null> {
+    return this.mutate((db) => {
+      const idx = db.tasks.findIndex((t) => t.id === id);
+      if (idx === -1) return null;
+      const existing = db.tasks[idx]!;
+      const updated: Task = { ...existing, ...patch, updatedAt: new Date().toISOString() };
+      db.tasks[idx] = updated;
+      return updated;
+    });
+  }
+
+  async getTask(id: TaskId): Promise<Task | null> {
+    const db = await this.readDb();
+    return db.tasks.find((t) => t.id === id) ?? null;
+  }
+
+  async listTasks(filter: TaskFilter = {}): Promise<Task[]> {
+    const db = await this.readDb();
+    let result = db.tasks;
+    if (filter.statuses?.length) result = result.filter((t) => filter.statuses!.includes(t.status));
+    if (filter.ownerId) result = result.filter((t) => t.ownerId === filter.ownerId);
+    if (filter.partnerId) result = result.filter((t) => t.partnerId === filter.partnerId);
+    if (filter.leadId) result = result.filter((t) => t.leadId === filter.leadId);
+    return result;
+  }
+
+  async deleteTask(id: TaskId): Promise<boolean> {
+    return this.mutate((db) => {
+      const before = db.tasks.length;
+      db.tasks = db.tasks.filter((t) => t.id !== id);
+      return db.tasks.length !== before;
+    });
+  }
+
+  // ─── Deals ──────────────────────────────────────────────────────────────
+
+  async createDeal(d: Deal): Promise<Deal> {
+    return this.mutate((db) => {
+      db.deals.unshift(d);
+      return d;
+    });
+  }
+
+  async updateDeal(id: DealId, patch: Partial<Deal>): Promise<Deal | null> {
+    return this.mutate((db) => {
+      const idx = db.deals.findIndex((d) => d.id === id);
+      if (idx === -1) return null;
+      const existing = db.deals[idx]!;
+      const updated: Deal = { ...existing, ...patch, updatedAt: new Date().toISOString() };
+      db.deals[idx] = updated;
+      return updated;
+    });
+  }
+
+  async getDeal(id: DealId): Promise<Deal | null> {
+    const db = await this.readDb();
+    return db.deals.find((d) => d.id === id) ?? null;
+  }
+
+  async listDeals(filter: DealFilter = {}): Promise<Deal[]> {
+    const db = await this.readDb();
+    let result = db.deals;
+    if (filter.statuses?.length) result = result.filter((d) => filter.statuses!.includes(d.status));
+    if (filter.partnerId) result = result.filter((d) => d.partnerId === filter.partnerId);
+    if (filter.leadId) result = result.filter((d) => d.leadId === filter.leadId);
+    return result;
+  }
+
+  // ─── Commissions ────────────────────────────────────────────────────────
+
+  async createCommission(c: Commission): Promise<Commission> {
+    return this.mutate((db) => {
+      db.commissions.unshift(c);
+      return c;
+    });
+  }
+
+  async updateCommission(id: CommissionId, patch: Partial<Commission>): Promise<Commission | null> {
+    return this.mutate((db) => {
+      const idx = db.commissions.findIndex((c) => c.id === id);
+      if (idx === -1) return null;
+      const existing = db.commissions[idx]!;
+      const updated: Commission = { ...existing, ...patch, updatedAt: new Date().toISOString() };
+      db.commissions[idx] = updated;
+      return updated;
+    });
+  }
+
+  async getCommission(id: CommissionId): Promise<Commission | null> {
+    const db = await this.readDb();
+    return db.commissions.find((c) => c.id === id) ?? null;
+  }
+
+  async listCommissions(filter: CommissionFilter = {}): Promise<Commission[]> {
+    const db = await this.readDb();
+    let result = db.commissions;
+    if (filter.statuses?.length) result = result.filter((c) => filter.statuses!.includes(c.status));
+    if (filter.partnerId) result = result.filter((c) => c.partnerId === filter.partnerId);
+    return result;
   }
 }

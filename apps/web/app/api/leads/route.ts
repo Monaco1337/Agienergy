@@ -23,6 +23,7 @@ const schema = z.object({
   phone: z.string().trim().min(5).max(40),
   email: z.string().trim().email(),
   zip: z.string().trim().min(4).max(120),
+  annualConsumptionKwh: z.number().int().positive().max(999_999).optional(),
   fileName: z.string().max(260).optional(),
   fileType: z.string().max(120).optional(),
   fileSize: z.number().nonnegative().optional(),
@@ -124,7 +125,8 @@ export async function POST(req: Request) {
     interests: map.interests,
     urgency: 'unknown',
     hasInvoice: hasFile ? 'upload_now' : 'unknown',
-    monthlyEnergyCosts: 'unknown',
+    monthlyEnergyCosts: 'unknown' as const,
+    annualConsumptionKwh: d.annualConsumptionKwh,
     ownsProperty: map.ownsProperty,
     contactPreference: 'phone',
 

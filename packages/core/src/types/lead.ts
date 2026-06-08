@@ -48,6 +48,14 @@ export type ContactPreference = 'phone' | 'whatsapp' | 'email';
 
 export type LeadColor = 'red' | 'orange' | 'yellow' | 'blue' | 'gray' | 'black';
 
+export type LeadPriority = 'urgent' | 'high' | 'normal' | 'low';
+
+/**
+ * Top-Level-Kategorie für die Operations-View. Wird zusätzlich zu
+ * `interests` geführt (interests bleibt für die Funnel-Logik bestehen).
+ */
+export type LeadCategory = 'strom' | 'gas' | 'solar' | 'gewerbe';
+
 export type LeadStatus =
   | 'Neu'
   | 'Zu prüfen'
@@ -137,6 +145,8 @@ export interface Lead {
   urgency: Urgency;
   hasInvoice: HasInvoice;
   monthlyEnergyCosts: MonthlyEnergyCosts;
+  /** Jahresverbrauch in kWh – optional aus Hero-Formular. */
+  annualConsumptionKwh?: number;
   ownsProperty: OwnsProperty;
   contactPreference?: ContactPreference;
 
@@ -159,6 +169,18 @@ export interface Lead {
 
   status: LeadStatus;
   assignedTo?: string;
+  /** Vertriebspartner, an den der Lead aktuell verteilt ist. */
+  assignedPartnerId?: string;
+  /** Zeitpunkt der Verteilung. */
+  assignedAt?: string;
+  /** Manuelle Priorität (zusätzlich zu leadColor). */
+  priority?: LeadPriority;
+  /** Klare Handlungsempfehlung – Human-Override oder von AI. */
+  nextAction?: string;
+  /** ISO-Datum, an dem der Lead abgeschlossen oder verloren wurde. */
+  closedAt?: string;
+  /** Optionaler Top-Level-Bereich (mappt auf Landing-Kategorien). */
+  category?: LeadCategory;
   nextFollowUpAt?: string;
   lastContactAt?: string;
 
@@ -188,6 +210,8 @@ export interface LeadFunnelInput {
   urgency: Urgency;
   hasInvoice: HasInvoice;
   monthlyEnergyCosts: MonthlyEnergyCosts;
+  /** Jahresverbrauch in kWh – optional aus Hero-Formular. */
+  annualConsumptionKwh?: number;
   ownsProperty: OwnsProperty;
   contactPreference?: ContactPreference;
 

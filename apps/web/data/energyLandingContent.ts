@@ -26,10 +26,16 @@ export const energyLandingContent = {
     cardSubline:
       'Ihre Unterlagen werden nicht automatisiert ausgewertet, sondern persönlich geprüft und vertraulich behandelt.',
     badgeFree: 'Kostenlos',
-    uploadHeadline: 'Jahresabrechnung vertraulich übermitteln',
-    uploadHint: 'PDF oder Foto · sicher übertragen · max. 10 MB',
-    uploadTrustLine:
-      'Ihre Daten werden ausschließlich zur Bearbeitung Ihrer Anfrage verwendet.',
+    uploadOptional: 'Optional',
+    uploadHeadline: 'Jahresabrechnung anhängen',
+    uploadHint: 'PDF oder Foto · max. 10 MB',
+    uploadBenefit: 'Hilft bei der Prüfung – kein Muss.',
+    uploadOfferHint:
+      'Damit können wir Ihnen ein passenderes Angebot erstellen – freiwillig und ohne Verpflichtung.',
+    uploadCta: 'Datei wählen',
+    uploadTrustLine: 'Nur zur Bearbeitung Ihrer Anfrage · vertraulich behandelt.',
+    annualConsumptionLabel: 'Jahresverbrauch (kWh)',
+    annualConsumptionPlaceholder: 'z. B. 3500',
     submit: 'Jetzt persönlich prüfen lassen',
     submitting: 'Anfrage wird vertraulich übermittelt…',
     submitFootnote: 'Keine automatische Tarifentscheidung · Persönliche Rückmeldung',

@@ -1,6 +1,13 @@
 import type { UserId } from './lead';
 
-export type Role = 'admin' | 'sales' | 'viewer';
+/**
+ * Rollen-Hierarchie:
+ *  - admin   : Vollzugriff (Distribution, Provisionen, Settings)
+ *  - sales   : interner Vertriebsmitarbeiter (alle Leads)
+ *  - partner : externer Vertriebspartner (sieht nur eigene Leads)
+ *  - viewer  : reiner Lesezugriff
+ */
+export type Role = 'admin' | 'sales' | 'partner' | 'viewer';
 
 export interface AdminUser {
   id: UserId;
@@ -12,4 +19,6 @@ export interface AdminUser {
   failedLoginCount: number;
   lockedUntil?: string;
   lastLoginAt?: string;
+  /** Verknüpfung Login-Konto ↔ Vertriebspartner-Stammdaten. */
+  partnerId?: string;
 }

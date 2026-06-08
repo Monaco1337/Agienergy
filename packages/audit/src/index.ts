@@ -10,16 +10,23 @@ export interface AuditContext {
   requestId?: string;
 }
 
-export function diffObjects(
-  before: Record<string, unknown> | undefined,
-  after: Record<string, unknown> | undefined,
+export function diffObjects<T extends object>(
+  before: T | undefined,
+  after: T | undefined,
+  /** Optionaler Whitelist-Filter; nur diese Keys werden geprüft. */
+  onlyKeys?: readonly (keyof T | string)[],
 ): Record<string, { from: unknown; to: unknown }> | undefined {
   if (!before || !after) return undefined;
-  const keys = new Set([...Object.keys(before), ...Object.keys(after)]);
+  const b = before as Record<string, unknown>;
+  const a = after as Record<string, unknown>;
+  const allKeys = new Set([...Object.keys(b), ...Object.keys(a)]);
+  const keys = onlyKeys?.length
+    ? (onlyKeys as readonly string[]).filter((k) => allKeys.has(k))
+    : Array.from(allKeys);
   const out: Record<string, { from: unknown; to: unknown }> = {};
   for (const k of keys) {
-    if (JSON.stringify(before[k]) !== JSON.stringify(after[k])) {
-      out[k] = { from: before[k], to: after[k] };
+    if (JSON.stringify(b[k]) !== JSON.stringify(a[k])) {
+      out[k] = { from: b[k], to: a[k] };
     }
   }
   return Object.keys(out).length > 0 ? out : undefined;

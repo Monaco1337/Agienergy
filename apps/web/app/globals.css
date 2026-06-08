@@ -526,43 +526,34 @@ a {
   }
 }
 
-/* Upload-Zone in Dark-Glass-Card – kompakt für Above-the-Fold */
-.hero-form-card .upload-dropzone {
-  background: rgba(255, 255, 255, 0.02) !important;
-  border: 1px dashed rgba(57, 216, 232, 0.26) !important;
-  border-radius: 18px !important;
-  min-height: 128px !important;
-  padding: 16px 20px !important;
-  transition: background 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-    border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+/* Optionaler Upload – dezente Anhang-Zeile, nicht als Hero-Block */
+.hero-form-card .upload-attach-row,
+.hero-form-card .upload-attach-filled {
+  transition: background 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
-.hero-form-card .upload-dropzone:hover {
-  background: rgba(57, 216, 232, 0.04) !important;
-  border-color: rgba(57, 216, 232, 0.45) !important;
+.hero-form-card .upload-attach-optional {
+  color: rgba(235, 245, 250, 0.52) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
 }
-.hero-form-card .upload-dropzone p {
-  color: rgba(245, 250, 255, 0.92) !important;
+.hero-form-card .upload-attach-row .text-slate,
+.hero-form-card .upload-attach-filled .text-slate {
+  color: rgba(235, 245, 250, 0.55) !important;
 }
-.hero-form-card .upload-dropzone .text-slate {
-  color: rgba(235, 245, 250, 0.62) !important;
-}
-.hero-form-card .upload-dropzone .text-cyanDeep {
+.hero-form-card .upload-attach-cta:hover {
   color: rgba(57, 216, 232, 0.95) !important;
 }
-.hero-form-card .upload-dropzone .bg-cyan\/10 {
-  background: rgba(57, 216, 232, 0.10) !important;
+.hero-form-card .upload-attach-filled .text-cyanDeep {
+  color: rgba(57, 216, 232, 0.95) !important;
 }
-
-.hero-form-card .upload-dropzone-filled {
-  background: rgba(255, 255, 255, 0.04) !important;
-  border-color: rgba(255, 255, 255, 0.10) !important;
-  border-radius: 18px !important;
-}
-.hero-form-card .upload-dropzone-filled p.text-navy {
-  color: rgba(245, 250, 255, 0.94) !important;
-}
-.hero-form-card .upload-dropzone-filled p.text-slate {
-  color: rgba(235, 245, 250, 0.60) !important;
+@media (max-width: 1023px) {
+  .hero-form-card .upload-attach-row {
+    flex-wrap: wrap;
+  }
+  .hero-form-card .upload-attach-cta {
+    width: 100%;
+    text-align: center;
+  }
 }
 
 /* Trust-line Icon im Upload-Hinweis (ShieldIcon im Form) – heller halten */
@@ -2330,4 +2321,287 @@ a {
     0 0 0 1px rgba(57, 216, 232, 0.06),
     0 0 34px rgba(57, 216, 232, 0.08),
     inset 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+
+/* —————————————————————————————————————————————————————————————
+   AGI Operations Center – Token-Layer (Lead Distribution Console)
+   Eigene Variablen mit den Spec-Farben. Werden zusätzlich zu den
+   gemappten --elo-* exponiert, damit neue Komponenten die
+   Spec-Werte direkt referenzieren können.
+   ————————————————————————————————————————————————————————————— */
+.agi-admin {
+  --ops-bg: #05070a;
+  --ops-sidebar: #070b10;
+  --ops-panel: #0d141b;
+  --ops-card: #111a22;
+  --ops-card-elev: #16232e;
+
+  --ops-border: rgba(255, 255, 255, 0.08);
+  --ops-border-strong: rgba(255, 255, 255, 0.16);
+
+  --ops-text: #f8fafc;
+  --ops-text-2: #94a3b8;
+  --ops-muted: #64748b;
+
+  --ops-cyan: #36e6d0;
+  --ops-cyan-soft: rgba(54, 230, 208, 0.12);
+  --ops-blue: #38bdf8;
+  --ops-success: #22c55e;
+  --ops-warning: #f59e0b;
+  --ops-critical: #ef4444;
+  --ops-gold: #eab308;
+
+  /* Backwards-kompatibel: Bestehende Komponenten lesen --elo-paper. */
+  --elo-paper: var(--ops-bg);
+  --elo-paper-2: var(--ops-sidebar);
+  --elo-card: var(--ops-card);
+  --elo-ink: var(--ops-text);
+  --elo-ink-2: var(--ops-text-2);
+  --elo-muted: var(--ops-muted);
+  --elo-line: var(--ops-border);
+  --elo-line-strong: var(--ops-border-strong);
+
+  background-color: var(--ops-bg);
+}
+.agi-admin::before {
+  background:
+    radial-gradient(1200px 640px at 100% -8%, rgba(54, 230, 208, 0.12), transparent 56%),
+    radial-gradient(900px 520px at -8% 0%, rgba(56, 189, 248, 0.08), transparent 55%),
+    radial-gradient(140% 120% at 50% 120%, rgba(54, 230, 208, 0.045), transparent 60%),
+    linear-gradient(180deg, #06090d 0%, #04070b 48%, #03060a 100%);
+}
+.agi-admin .agi-admin-aside {
+  background: linear-gradient(180deg, var(--ops-sidebar) 0%, #04080c 100%);
+}
+
+/* Operations-Card – Standard-Surface */
+.agi-admin .ops-card {
+  position: relative;
+  background: linear-gradient(180deg, var(--ops-card) 0%, #0e161e 100%);
+  border: 1px solid var(--ops-border);
+  border-radius: 14px;
+  box-shadow:
+    0 16px 48px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+.agi-admin .ops-card-hover {
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.25s ease,
+    transform 0.2s ease;
+}
+.agi-admin .ops-card-hover:hover {
+  border-color: rgba(54, 230, 208, 0.32);
+  box-shadow:
+    0 22px 60px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(54, 230, 208, 0.08),
+    0 0 36px rgba(54, 230, 208, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+/* Erhöhte Karte (Drawer/Panel) */
+.agi-admin .ops-elevated {
+  background: linear-gradient(180deg, var(--ops-card-elev) 0%, var(--ops-card) 100%);
+  border: 1px solid var(--ops-border);
+  border-radius: 14px;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.55);
+}
+
+/* KPI-Tile – Nummer-fokussiert */
+.agi-admin .ops-kpi {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(180deg, rgba(17, 26, 34, 0.95) 0%, rgba(13, 20, 27, 0.95) 100%);
+  border: 1px solid var(--ops-border);
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow:
+    0 14px 40px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+.agi-admin .ops-kpi::after {
+  content: '';
+  position: absolute;
+  inset: -1px -1px auto auto;
+  width: 70%;
+  height: 60%;
+  background: radial-gradient(60% 80% at 100% 0%, rgba(54, 230, 208, 0.14), transparent 70%);
+  pointer-events: none;
+}
+
+/* Sidebar-Items */
+.agi-admin .ops-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  color: var(--ops-text-2);
+  font-size: 13.5px;
+  font-weight: 500;
+  letter-spacing: 0.005em;
+  transition:
+    color 0.15s ease,
+    background 0.15s ease,
+    border-color 0.15s ease;
+  border: 1px solid transparent;
+}
+.agi-admin .ops-nav-item:hover {
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--ops-text);
+}
+.agi-admin .ops-nav-item[data-active='true'] {
+  background: linear-gradient(
+    90deg,
+    rgba(54, 230, 208, 0.14) 0%,
+    rgba(54, 230, 208, 0.04) 60%,
+    transparent 100%
+  );
+  border-color: rgba(54, 230, 208, 0.25);
+  color: var(--ops-text);
+  box-shadow: 0 0 24px rgba(54, 230, 208, 0.14);
+}
+.agi-admin .ops-nav-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  color: var(--ops-text-2);
+}
+.agi-admin .ops-nav-item[data-active='true'] .ops-nav-icon {
+  color: var(--ops-cyan);
+}
+
+/* Status-Pill (Statuschip / Lead-Status) */
+.agi-admin .ops-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 22px;
+  padding: 0 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--ops-border);
+  color: var(--ops-text-2);
+}
+.agi-admin .ops-pill::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: currentColor;
+}
+.agi-admin .ops-pill[data-tone='cyan'] {
+  background: rgba(54, 230, 208, 0.1);
+  border-color: rgba(54, 230, 208, 0.3);
+  color: var(--ops-cyan);
+}
+.agi-admin .ops-pill[data-tone='success'] {
+  background: rgba(34, 197, 94, 0.1);
+  border-color: rgba(34, 197, 94, 0.3);
+  color: var(--ops-success);
+}
+.agi-admin .ops-pill[data-tone='warning'] {
+  background: rgba(245, 158, 11, 0.1);
+  border-color: rgba(245, 158, 11, 0.32);
+  color: var(--ops-warning);
+}
+.agi-admin .ops-pill[data-tone='critical'] {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.34);
+  color: var(--ops-critical);
+}
+.agi-admin .ops-pill[data-tone='gold'] {
+  background: rgba(234, 179, 8, 0.1);
+  border-color: rgba(234, 179, 8, 0.3);
+  color: var(--ops-gold);
+}
+.agi-admin .ops-pill[data-tone='blue'] {
+  background: rgba(56, 189, 248, 0.1);
+  border-color: rgba(56, 189, 248, 0.3);
+  color: var(--ops-blue);
+}
+
+/* Drop-Zonen für Distribution-Center */
+.agi-admin .ops-dropzone {
+  border: 1px dashed rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  background: rgba(13, 20, 27, 0.4);
+  transition:
+    border-color 0.18s ease,
+    background 0.18s ease,
+    box-shadow 0.25s ease;
+}
+.agi-admin .ops-dropzone[data-over='true'] {
+  border-color: rgba(54, 230, 208, 0.6);
+  background: rgba(54, 230, 208, 0.08);
+  box-shadow:
+    0 0 0 1px rgba(54, 230, 208, 0.4),
+    0 0 40px rgba(54, 230, 208, 0.18);
+}
+.agi-admin .ops-draggable {
+  cursor: grab;
+}
+.agi-admin .ops-draggable:active {
+  cursor: grabbing;
+}
+.agi-admin .ops-draggable[data-dragging='true'] {
+  opacity: 0.5;
+}
+
+/* Touch-CTA: groß, gut tappbar */
+.agi-admin .ops-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 38px;
+  padding: 0 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.005em;
+  background: linear-gradient(135deg, var(--ops-cyan) 0%, #1bc6b1 100%);
+  color: #052523;
+  box-shadow: 0 8px 24px rgba(54, 230, 208, 0.28);
+  transition:
+    box-shadow 0.2s ease,
+    transform 0.15s ease;
+}
+.agi-admin .ops-cta:hover {
+  box-shadow: 0 10px 32px rgba(54, 230, 208, 0.42);
+  transform: translateY(-1px);
+}
+.agi-admin .ops-cta-ghost {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--ops-border);
+  color: var(--ops-text);
+}
+.agi-admin .ops-cta-ghost:hover {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(54, 230, 208, 0.28);
+}
+
+/* Mobile Drawer Backdrop */
+.agi-admin .ops-drawer-backdrop {
+  background: radial-gradient(120% 80% at 50% 0%, rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.85));
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Scrollbar etwas dezenter im Admin */
+.agi-admin ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+.agi-admin ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+}
+.agi-admin ::-webkit-scrollbar-thumb:hover {
+  background: rgba(54, 230, 208, 0.2);
 }

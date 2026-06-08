@@ -1,492 +1,397 @@
 import Link from 'next/link';
 import { getStorage } from '@elo/storage';
-import type { Lead, LeadColor } from '@elo/core';
-import { LeadColorBadge } from '@/components/admin/LeadColorBadge';
-import { ContactBadge } from '@/components/admin/ContactBadge';
-import { ConsentBadge } from '@/components/admin/ConsentBadge';
-import { Badge } from '@elo/ui';
+import { requireSession, isAdminRole, isPartnerRole, getCurrentPartnerId } from '@/lib/agi/permissions';
+import { LeadCard } from '@/components/agi/leads/LeadCard';
 
 export const dynamic = 'force-dynamic';
+export const metadata = { title: 'Cockpit · AGI Operations Center' };
 
-const COLOR_PRIORITY: Record<LeadColor, number> = {
-  red: 5,
-  orange: 4,
-  yellow: 3,
-  blue: 2,
-  gray: 1,
-  black: 0,
-};
+function fmtEur(v: number): string {
+  return v.toLocaleString('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
+}
 
-const INTEREST_LABEL: Record<string, string> = {
-  strom: 'Strom',
-  gas: 'Gas',
-  strom_gas: 'Strom & Gas',
-  photovoltaik: 'Photovoltaik',
-  unknown: 'Allgemein',
-};
+interface Kpi {
+  label: string;
+  value: string | number;
+  hint?: string;
+  href?: string;
+  tone?: 'cyan' | 'gold' | 'success' | 'critical' | 'warning';
+}
 
-const TYPE_LABEL: Record<string, string> = {
-  private: 'Privat',
-  home_owner: 'Eigentümer',
-  business: 'Gewerbe',
-  landlord: 'Vermieter',
-  unknown: '—',
-};
+function KpiTile({ kpi }: { kpi: Kpi }) {
+  const color =
+    kpi.tone === 'cyan'
+      ? 'var(--ops-cyan)'
+      : kpi.tone === 'gold'
+        ? 'var(--ops-gold)'
+        : kpi.tone === 'success'
+          ? 'var(--ops-success)'
+          : kpi.tone === 'critical'
+            ? 'var(--ops-critical)'
+            : kpi.tone === 'warning'
+              ? 'var(--ops-warning)'
+              : 'var(--ops-text)';
+  const inner = (
+    <div className="ops-kpi h-full">
+      <div className="text-[10.5px] uppercase tracking-[0.14em] text-[var(--ops-muted)]">{kpi.label}</div>
+      <div className="mt-2 text-[26px] sm:text-[28px] font-display font-semibold tabular-nums" style={{ color }}>
+        {kpi.value}
+      </div>
+      {kpi.hint && <div className="mt-1 text-[11.5px] text-[var(--ops-text-2)]">{kpi.hint}</div>}
+    </div>
+  );
+  return kpi.href ? <Link href={kpi.href}>{inner}</Link> : inner;
+}
 
-function isToday(iso: string): boolean {
-  const d = new Date(iso);
-  const now = new Date();
+interface Alert {
+  message: string;
+  href: string;
+  tone: 'cyan' | 'critical' | 'warning' | 'gold';
+  count: number;
+}
+
+function AlertCard({ alert }: { alert: Alert }) {
   return (
-    d.getDate() === now.getDate() &&
-    d.getMonth() === now.getMonth() &&
-    d.getFullYear() === now.getFullYear()
+    <Link href={alert.href} className="ops-card ops-card-hover p-4 flex items-center gap-3">
+      <span
+        className="inline-flex items-center justify-center size-9 rounded-full font-display font-semibold tabular-nums shrink-0"
+        style={{
+          background:
+            alert.tone === 'critical'
+              ? 'rgba(239,68,68,0.16)'
+              : alert.tone === 'warning'
+                ? 'rgba(245,158,11,0.14)'
+                : alert.tone === 'gold'
+                  ? 'rgba(234,179,8,0.14)'
+                  : 'rgba(54,230,208,0.12)',
+          color:
+            alert.tone === 'critical'
+              ? '#fca5a5'
+              : alert.tone === 'warning'
+                ? '#fbbf24'
+                : alert.tone === 'gold'
+                  ? '#facc15'
+                  : '#7df2e0',
+        }}
+      >
+        {alert.count}
+      </span>
+      <div className="min-w-0 flex-1 text-[13.5px] text-[var(--ops-text)]">{alert.message}</div>
+      <span className="text-[var(--ops-muted)]">→</span>
+    </Link>
   );
 }
 
-function canBeContacted(l: Lead): boolean {
-  return l.legalBasis !== 'unknown_blocked' && l.leadColor !== 'black';
-}
-
-function relativeTime(iso: string): string {
-  const diff = Date.now() - new Date(iso).getTime();
-  const min = Math.floor(diff / 60000);
-  if (min < 1) return 'gerade eben';
-  if (min < 60) return `vor ${min} Min`;
-  const h = Math.floor(min / 60);
-  if (h < 24) return `vor ${h} Std`;
-  const d = Math.floor(h / 24);
-  if (d === 1) return 'gestern';
-  if (d < 7) return `vor ${d} Tagen`;
-  return new Date(iso).toLocaleDateString('de-DE');
-}
-
 export default async function AdminCockpit() {
+  const session = await requireSession();
+  const partnerId = await getCurrentPartnerId(session);
   const storage = getStorage();
-  const leads = await storage.listLeads();
 
-  const newToday = leads.filter((l) => isToday(l.createdAt));
-  const hot = leads.filter((l) => l.leadColor === 'red' || l.leadColor === 'orange');
-  const callableToday = leads
-    .filter((l) => canBeContacted(l) && l.contactHistory.length === 0)
-    .sort((a, b) => {
-      const cp = COLOR_PRIORITY[b.leadColor] - COLOR_PRIORITY[a.leadColor];
-      if (cp !== 0) return cp;
-      return b.leadScore - a.leadScore;
-    });
+  const isPartner = isPartnerRole(session.role);
+  const adminView = isAdminRole(session.role);
 
-  const top = callableToday.slice(0, 6);
-  const nextUp = callableToday.slice(6, 12);
-  const blocked = leads.filter((l) => !canBeContacted(l));
+  // Daten laden
+  const [allLeads, allPartners, allDeals, allCommissions, allTasks] = await Promise.all([
+    storage.listLeads(),
+    storage.listPartners(),
+    storage.listDeals(),
+    storage.listCommissions(),
+    storage.listTasks(),
+  ]);
 
-  const pipeline: Array<{ key: string; label: string; count: number; color: LeadColor }> = [
-    { key: 'red', label: 'Sofort-Abschluss', count: leads.filter((l) => l.leadColor === 'red').length, color: 'red' },
-    { key: 'orange', label: 'Sehr heiß', count: leads.filter((l) => l.leadColor === 'orange').length, color: 'orange' },
-    { key: 'yellow', label: 'Warm', count: leads.filter((l) => l.leadColor === 'yellow').length, color: 'yellow' },
-    { key: 'blue', label: 'Information', count: leads.filter((l) => l.leadColor === 'blue').length, color: 'blue' },
-    { key: 'gray', label: 'Niedrig', count: leads.filter((l) => l.leadColor === 'gray').length, color: 'gray' },
-    { key: 'black', label: 'Gesperrt', count: leads.filter((l) => l.leadColor === 'black').length, color: 'black' },
-  ];
-  const pipelineMax = Math.max(1, ...pipeline.map((p) => p.count));
+  // Partner-Sicht: Daten beschränken
+  const myLeads = isPartner ? allLeads.filter((l) => l.assignedPartnerId === partnerId) : allLeads;
+  const myDeals = isPartner ? allDeals.filter((d) => d.partnerId === partnerId) : allDeals;
+  const myCommissions = isPartner ? allCommissions.filter((c) => c.partnerId === partnerId) : allCommissions;
+  const myTasks = isPartner
+    ? allTasks.filter((t) => t.ownerId === session.userId || t.partnerId === partnerId)
+    : allTasks;
 
-  const bySource = new Map<string, number>();
-  for (const l of leads) bySource.set(l.source, (bySource.get(l.source) ?? 0) + 1);
-  const sources = [...bySource.entries()].sort((a, b) => b[1] - a[1]);
-  const sourceMax = Math.max(1, ...sources.map(([, n]) => n));
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0);
 
-  const isDemoMode = leads.length > 0 && leads.every((l) => l.isDemo);
-  const today = new Date().toLocaleDateString('de-DE', {
-    weekday: 'long',
-    day: '2-digit',
-    month: 'long',
+  const leadsToday = myLeads.filter((l) => new Date(l.createdAt) >= todayStart).length;
+  const unassigned = myLeads.filter((l) => !l.assignedPartnerId);
+  const assigned = myLeads.filter((l) => l.assignedPartnerId).length;
+  const inProgress = myLeads.filter((l) =>
+    ['Angerufen', 'Rückruf geplant', 'Beratung durchgeführt', 'Angebot vorbereitet', 'Angebot gesendet'].includes(l.status),
+  ).length;
+  const callNow = myLeads.filter((l) => l.status === 'Heute anrufen' || (l.status === 'Neu' && (l.leadColor === 'red' || l.leadColor === 'orange'))).length;
+  const closed = myLeads.filter((l) => l.status === 'Abgeschlossen').length;
+  const conv = myLeads.length > 0 ? closed / myLeads.length : 0;
+  const openCommission = myCommissions
+    .filter((c) => c.status === 'pending' || c.status === 'approved')
+    .reduce((sum, c) => sum + (c.amount ?? 0), 0);
+
+  // Alerts (Admin-fokussiert)
+  const partnersOverCap = allPartners.filter((p) => {
+    const active = allLeads.filter(
+      (l) =>
+        l.assignedPartnerId === p.id &&
+        l.status !== 'Abgeschlossen' &&
+        l.status !== 'Verloren' &&
+        l.status !== 'Gesperrt',
+    ).length;
+    return active >= p.capacity && p.capacity > 0;
   });
+  const dealsWithoutCommission = allDeals.filter((d) => d.status === 'confirmed' && !allCommissions.some((c) => c.dealId === d.id));
+  const hotUnassigned = unassigned.filter((l) => l.leadColor === 'red' || l.leadColor === 'orange');
+  const alerts: Alert[] = [];
+  if (adminView) {
+    if (unassigned.length > 0) {
+      alerts.push({
+        count: unassigned.length,
+        message: `Leads warten auf Verteilung`,
+        href: '/admin/distribution',
+        tone: 'critical',
+      });
+    }
+    if (hotUnassigned.length > 0) {
+      alerts.push({
+        count: hotUnassigned.length,
+        message: 'Hot-Leads unverteilt – sofort routen',
+        href: '/admin/distribution?filter=hot',
+        tone: 'critical',
+      });
+    }
+    if (partnersOverCap.length > 0) {
+      alerts.push({
+        count: partnersOverCap.length,
+        message: 'Partner über Kapazität',
+        href: '/admin/performance',
+        tone: 'warning',
+      });
+    }
+    if (dealsWithoutCommission.length > 0) {
+      alerts.push({
+        count: dealsWithoutCommission.length,
+        message: 'Bestätigte Abschlüsse ohne Provisionsstatus',
+        href: '/admin/abschluesse',
+        tone: 'gold',
+      });
+    }
+    const reportedDeals = allDeals.filter((d) => d.status === 'reported' || d.status === 'review').length;
+    if (reportedDeals > 0) {
+      alerts.push({
+        count: reportedDeals,
+        message: 'Abschlussmeldungen warten auf Prüfung',
+        href: '/admin/abschluesse',
+        tone: 'cyan',
+      });
+    }
+  }
+
+  if (callNow > 0) {
+    alerts.push({
+      count: callNow,
+      message: 'Hot-Leads – jetzt anrufen',
+      href: isPartner ? '/admin/meine-leads' : '/admin/lead-feed?filter=hot',
+      tone: 'critical',
+    });
+  }
+  const overdueTasks = myTasks.filter(
+    (t) => t.dueAt && t.status !== 'done' && new Date(t.dueAt).getTime() < Date.now(),
+  ).length;
+  if (overdueTasks > 0) {
+    alerts.push({
+      count: overdueTasks,
+      message: 'Überfällige Aufgaben',
+      href: '/admin/aufgaben',
+      tone: 'warning',
+    });
+  }
+
+  // Top-Prioritäten (für Live-Vorschau)
+  const sortedHot = [...myLeads]
+    .filter((l) => l.status !== 'Abgeschlossen' && l.status !== 'Verloren' && l.status !== 'Gesperrt')
+    .sort((a, b) => {
+      const colorRank = (c: typeof a.leadColor) =>
+        ({ red: 0, orange: 1, yellow: 2, blue: 3, gray: 4, black: 5 })[c] ?? 99;
+      const cr = colorRank(a.leadColor) - colorRank(b.leadColor);
+      if (cr !== 0) return cr;
+      return b.leadScore - a.leadScore;
+    })
+    .slice(0, 6);
+
+  const partnerById = Object.fromEntries(allPartners.map((p) => [p.id, p]));
+
+  // KPIs
+  const kpis: Kpi[] = adminView
+    ? [
+        { label: 'Leads heute', value: leadsToday, tone: 'cyan', href: '/admin/lead-feed?filter=today' },
+        {
+          label: 'Unverteilt',
+          value: unassigned.length,
+          tone: unassigned.length > 0 ? 'warning' : undefined,
+          href: '/admin/distribution',
+        },
+        { label: 'Verteilt', value: assigned, tone: 'cyan', href: '/admin/leads' },
+        { label: 'In Bearbeitung', value: inProgress, href: '/admin/leads' },
+        { label: 'Sofort anrufen', value: callNow, tone: callNow > 0 ? 'critical' : undefined, href: '/admin/lead-feed?filter=hot' },
+        { label: 'Abschlüsse', value: closed, tone: 'success', href: '/admin/abschluesse' },
+        { label: 'Conversion', value: `${Math.round(conv * 100)}%`, tone: 'cyan', href: '/admin/performance' },
+        { label: 'Provision offen', value: fmtEur(openCommission), tone: 'gold', href: '/admin/provisionen' },
+      ]
+    : [
+        { label: 'Neue Leads', value: myLeads.filter((l) => l.status === 'Neu').length, tone: 'cyan', href: '/admin/meine-leads' },
+        { label: 'Heute anrufen', value: callNow, tone: 'critical', href: '/admin/meine-leads' },
+        { label: 'In Bearbeitung', value: inProgress, href: '/admin/meine-leads' },
+        { label: 'Abschlüsse Mt.', value: myDeals.filter((d) => d.status === 'confirmed' && new Date(d.closedAt ?? d.updatedAt).getMonth() === new Date().getMonth()).length, tone: 'success', href: '/admin/abschluesse' },
+        { label: 'Provision offen', value: fmtEur(openCommission), tone: 'gold', href: '/admin/provisionen' },
+        { label: 'Conversion', value: `${Math.round(conv * 100)}%`, tone: 'cyan', href: '/admin/performance' },
+      ];
 
   return (
-    <div className="space-y-9 max-w-[1280px]">
-      {/* Header */}
-      <header className="flex items-end justify-between flex-wrap gap-4">
+    <div className="space-y-7">
+      <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-[12px] uppercase tracking-[0.18em] text-sage font-semibold">
-            Vertriebs-Cockpit
-          </p>
-          <h1 className="mt-1.5 font-display text-[32px] leading-[1.05] tracking-[-0.02em] text-ink">
-            Heute wichtigste Leads
+          <div className="text-[11px] uppercase tracking-[0.18em] text-[var(--ops-muted)]">
+            AGI Energy · Lead Operations Center
+          </div>
+          <h1 className="font-display text-[28px] sm:text-[34px] tracking-[-0.015em] text-[var(--ops-text)]">
+            {adminView ? 'Cockpit' : 'Dein Tag'}
           </h1>
-          <p className="text-[13.5px] text-muted mt-2 capitalize">{today}</p>
+          <p className="mt-1 text-[13.5px] text-[var(--ops-text-2)] max-w-2xl">
+            Lead-Zufluss, Verteilung, Partnerleistung &amp; Abschlusskontrolle.
+          </p>
         </div>
-        <div className="flex items-center gap-3">
-          {isDemoMode && (
-            <span className="inline-flex items-center gap-2 h-9 px-3.5 rounded-pill border border-gold/40 bg-gold/10 text-gold2 text-[12px] font-semibold uppercase tracking-[0.12em]">
-              <span aria-hidden className="size-1.5 rounded-full bg-gold animate-pulse" />
-              Demo-Daten
-            </span>
-          )}
-          <Link
-            href="/admin/leads"
-            className="inline-flex items-center gap-2 h-9 px-4 rounded-pill bg-gradient-to-br from-cyan to-cyanDeep text-[#05201d] text-[13.5px] font-semibold shadow-[0_6px_20px_rgba(57,216,232,0.28)] hover:shadow-[0_8px_26px_rgba(57,216,232,0.42)] transition-shadow"
-          >
-            Alle Leads
-            <span aria-hidden>→</span>
-          </Link>
+        <div className="flex flex-wrap gap-2">
+          <span className="ops-pill" data-tone="cyan">
+            Heute · {new Date().toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+          </span>
+          <span className="ops-pill" data-tone="success">Live</span>
+          {myLeads.some((l) => l.isDemo) && <span className="ops-pill" data-tone="gold">Demo-Daten</span>}
+          <span className="ops-pill">{session.role}</span>
         </div>
       </header>
 
-      {/* KPI-Band */}
-      <section className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          accent="sage"
-          label="Jetzt kontaktierbar"
-          value={callableToday.length}
-          hint="offen, freigegeben"
-          href="/admin/leads"
-        />
-        <StatCard
-          accent="red"
-          label="Heiße Leads"
-          value={hot.length}
-          hint="rot & orange"
-          href="/admin/leads?color=red&color=orange"
-        />
-        <StatCard
-          accent="blue"
-          label="Neu heute"
-          value={newToday.length}
-          hint="in den letzten 24 h"
-          href="/admin/leads"
-        />
-        <StatCard
-          accent="gold"
-          label="Leads gesamt"
-          value={leads.length}
-          hint={blocked.length > 0 ? `${blocked.length} gesperrt` : 'gesamter Bestand'}
-          href="/admin/leads"
-        />
+      <section className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 xl:grid-cols-8 gap-3">
+        {kpis.map((k) => (
+          <KpiTile key={k.label} kpi={k} />
+        ))}
       </section>
 
-      {/* TOP-PRIORITÄTEN */}
-      <section>
-        <SectionHeader
-          eyebrow="01 · Wen jetzt zuerst anrufen"
-          title="Top-Prioritäten"
-          right={
-            <Link
-              href="/admin/leads?color=red&color=orange"
-              className="text-sage text-[14px] font-semibold hover:text-sage2 inline-flex items-center gap-1"
-            >
-              Priorisierte Leads <span aria-hidden>→</span>
-            </Link>
-          }
-        />
-        {top.length === 0 ? (
-          <EmptyState
-            title="Alles abgearbeitet."
-            hint="Aktuell gibt es keine offenen Leads mit Priorität. Neue Anfragen erscheinen hier automatisch."
-          />
-        ) : (
-          <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
-            {top.map((l, i) => (
-              <LeadCockpitCard key={l.id} lead={l} rank={i + 1} />
-            ))}
-          </div>
-        )}
-      </section>
-
-      {/* NÄCHSTE LEADS */}
-      {nextUp.length > 0 && (
+      {alerts.length > 0 && (
         <section>
-          <SectionHeader eyebrow="02 · Danach" title="Weitere offene Leads" />
-          <div className="bg-card border border-line rounded-eloLg overflow-hidden divide-y divide-line shadow-eloSm">
-            {nextUp.map((l) => (
-              <CompactLeadRow key={l.id} lead={l} />
+          <h2 className="font-display text-[16px] text-[var(--ops-text)] mb-3">Kritische Alerts</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+            {alerts.map((a) => (
+              <AlertCard key={a.message} alert={a} />
             ))}
           </div>
         </section>
       )}
 
-      {/* PIPELINE + QUELLEN */}
-      <section className="grid gap-5 lg:grid-cols-3">
-        <div className="lg:col-span-2 bg-card border border-line rounded-eloLg p-6 shadow-eloSm">
-          <SectionHeader eyebrow="03 · Pipeline" title="Verteilung nach Priorität" inline />
-          <div className="mt-6 grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {pipeline.map((p) => (
-              <Link
-                key={p.key}
-                href={`/admin/leads?color=${p.key}`}
-                className="group block rounded-elo border border-line bg-paper2/30 hover:bg-paper2 hover:border-lineStrong px-4 py-3.5 transition-all"
-              >
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-[12.5px] text-muted truncate">{p.label}</span>
-                  <LeadColorBadge color={p.color} />
-                </div>
-                <div className="mt-2 font-display text-[26px] leading-none text-ink">{p.count}</div>
-                <div className="mt-2.5 h-1.5 rounded-full bg-line/70 overflow-hidden">
-                  <span
-                    className="block h-full rounded-full bg-sage/70 group-hover:bg-sage transition-all"
-                    style={{ width: `${Math.round((p.count / pipelineMax) * 100)}%` }}
-                  />
-                </div>
-              </Link>
-            ))}
+      <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_minmax(0,420px)] gap-5">
+        <section>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="font-display text-[18px] text-[var(--ops-text)]">Top-Prioritäten</h2>
+            <Link href={adminView ? '/admin/lead-feed' : '/admin/meine-leads'} className="text-[12px] text-[var(--ops-text-2)] hover:text-[var(--ops-cyan)]">
+              Alle Leads →
+            </Link>
           </div>
-        </div>
-
-        <div className="bg-card border border-line rounded-eloLg p-6 shadow-eloSm">
-          <SectionHeader eyebrow="Quellen" title="Top-Kanäle" inline />
-          {sources.length === 0 ? (
-            <p className="mt-4 text-[14px] text-muted">Noch keine Daten.</p>
+          {sortedHot.length === 0 ? (
+            <div className="ops-card p-8 text-center text-[14px] text-[var(--ops-text-2)]">
+              Keine offenen Prioritäten – sauber.
+            </div>
           ) : (
-            <ul className="mt-5 space-y-4 text-[14px]">
-              {sources.slice(0, 6).map(([s, n]) => (
-                <li key={s}>
-                  <div className="flex items-center justify-between">
-                    <span className="text-ink2 capitalize">{s.replace(/_/g, ' ')}</span>
-                    <span className="text-ink font-semibold tabular-nums">{n}</span>
-                  </div>
-                  <div className="mt-1.5 h-1.5 rounded-full bg-line/70 overflow-hidden">
-                    <span
-                      className="block h-full rounded-full bg-gold/70"
-                      style={{ width: `${Math.round((n / sourceMax) * 100)}%` }}
-                    />
-                  </div>
+            <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {sortedHot.map((l) => (
+                <li key={l.id}>
+                  <LeadCard
+                    lead={l}
+                    partner={l.assignedPartnerId ? partnerById[l.assignedPartnerId] : null}
+                  />
                 </li>
               ))}
             </ul>
           )}
-        </div>
-      </section>
-
-      {/* GESPERRT */}
-      {blocked.length > 0 && (
-        <section>
-          <SectionHeader
-            eyebrow="04 · Achtung"
-            title="Kontaktaufnahme nicht freigegeben"
-            right={<span className="text-[13px] text-muted">{blocked.length} Leads</span>}
-          />
-          <div className="bg-card border border-line rounded-eloLg overflow-hidden divide-y divide-line shadow-eloSm">
-            {blocked.slice(0, 5).map((l) => (
-              <CompactLeadRow key={l.id} lead={l} blocked />
-            ))}
-          </div>
         </section>
-      )}
-    </div>
-  );
-}
 
-/* ————————————————————————————————————————— Komponenten ————————————————————————————————————————— */
+        {adminView && (
+          <aside className="space-y-3">
+            <div className="ops-card p-5">
+              <div className="flex items-center justify-between">
+                <h2 className="font-display text-[16px] text-[var(--ops-text)]">Verteilungsübersicht</h2>
+                <Link href="/admin/distribution" className="text-[12px] text-[var(--ops-cyan)] hover:underline">
+                  Distribution →
+                </Link>
+              </div>
+              <ul className="mt-3 space-y-2.5">
+                {allPartners.slice(0, 6).map((p) => {
+                  const active = allLeads.filter(
+                    (l) =>
+                      l.assignedPartnerId === p.id &&
+                      l.status !== 'Abgeschlossen' &&
+                      l.status !== 'Verloren' &&
+                      l.status !== 'Gesperrt',
+                  ).length;
+                  const u = p.capacity > 0 ? Math.min(1, active / p.capacity) : 0;
+                  return (
+                    <li key={p.id}>
+                      <Link
+                        href={`/admin/vertriebspartner/${p.id}`}
+                        className="block hover:bg-white/[0.03] rounded-lg px-2 py-1.5 -mx-2"
+                      >
+                        <div className="flex items-center justify-between text-[13px]">
+                          <span className="truncate text-[var(--ops-text)]">{p.name}</span>
+                          <span className="text-[var(--ops-text-2)] tabular-nums text-[11.5px]">
+                            {active}/{p.capacity}
+                          </span>
+                        </div>
+                        <div className="mt-1 h-1 rounded-full bg-white/[0.05] overflow-hidden">
+                          <div
+                            className="h-full rounded-full"
+                            style={{
+                              width: `${Math.round(u * 100)}%`,
+                              background:
+                                u >= 0.95
+                                  ? 'linear-gradient(90deg,#ef4444,#f59e0b)'
+                                  : u >= 0.7
+                                    ? 'linear-gradient(90deg,#f59e0b,#eab308)'
+                                    : 'linear-gradient(90deg,#36e6d0,#38bdf8)',
+                            }}
+                          />
+                        </div>
+                      </Link>
+                    </li>
+                  );
+                })}
+                {allPartners.length === 0 && (
+                  <li className="text-[12.5px] text-[var(--ops-text-2)]">
+                    Noch keine Partner.{' '}
+                    <Link href="/admin/vertriebspartner/neu" className="text-[var(--ops-cyan)] hover:underline">
+                      Anlegen
+                    </Link>
+                  </li>
+                )}
+              </ul>
+            </div>
 
-const ACCENT: Record<string, { bar: string; dot: string; text: string; glow: string }> = {
-  sage: { bar: 'bg-sage', dot: 'bg-sage', text: 'text-sage', glow: 'from-sage/12' },
-  red: { bar: 'bg-leadRed', dot: 'bg-leadRed', text: 'text-leadRed', glow: 'from-leadRed/12' },
-  blue: { bar: 'bg-leadBlue', dot: 'bg-leadBlue', text: 'text-leadBlue', glow: 'from-leadBlue/12' },
-  gold: { bar: 'bg-gold', dot: 'bg-gold', text: 'text-gold', glow: 'from-gold/12' },
-};
-
-function StatCard({
-  accent,
-  label,
-  value,
-  hint,
-  href,
-}: {
-  accent: keyof typeof ACCENT;
-  label: string;
-  value: number;
-  hint: string;
-  href: string;
-}) {
-  const a = ACCENT[accent]!;
-  return (
-    <Link
-      href={href}
-      className="group relative overflow-hidden bg-card border border-line rounded-eloLg p-5 transition-all"
-    >
-      <span aria-hidden className={`absolute left-0 top-0 h-full w-1 ${a.bar}`} />
-      <span
-        aria-hidden
-        className={`pointer-events-none absolute -right-10 -top-10 size-32 rounded-full bg-gradient-to-br ${a.glow} to-transparent blur-2xl opacity-0 group-hover:opacity-100 transition-opacity`}
-      />
-      <div className="flex items-center gap-2">
-        <span aria-hidden className={`size-1.5 rounded-full ${a.dot}`} />
-        <span className="text-[11.5px] uppercase tracking-[0.12em] text-muted font-semibold">
-          {label}
-        </span>
-      </div>
-      <div className={`mt-3 font-display text-[42px] leading-none tracking-[-0.02em] tabular-nums ${a.text}`}>
-        {value}
-      </div>
-      <div className="mt-2 text-[12.5px] text-muted">{hint}</div>
-    </Link>
-  );
-}
-
-function SectionHeader({
-  eyebrow,
-  title,
-  right,
-  inline,
-}: {
-  eyebrow: string;
-  title: string;
-  right?: React.ReactNode;
-  inline?: boolean;
-}) {
-  return (
-    <div className={inline ? 'flex items-end justify-between gap-3' : 'mb-5 flex items-end justify-between gap-3'}>
-      <div>
-        <p className="text-[11.5px] uppercase tracking-[0.14em] text-muted font-semibold">{eyebrow}</p>
-        <h2 className="mt-1 font-display text-[20px] sm:text-[22px] tracking-[-0.01em] text-ink leading-tight">
-          {title}
-        </h2>
-      </div>
-      {right}
-    </div>
-  );
-}
-
-function EmptyState({ title, hint }: { title: string; hint: string }) {
-  return (
-    <div className="rounded-eloLg border border-dashed border-line bg-paper2/30 px-6 py-12 text-center">
-      <div className="text-[15px] font-semibold text-ink">{title}</div>
-      <p className="mt-1.5 text-[13.5px] text-muted max-w-md mx-auto">{hint}</p>
-    </div>
-  );
-}
-
-function CallIcon() {
-  return (
-    <svg width="15" height="15" viewBox="0 0 20 20" fill="none" aria-hidden>
-      <path
-        d="M4.5 3h3l1.2 3.2-1.7 1.3a10 10 0 004.5 4.5l1.3-1.7L16.5 14v3a1 1 0 01-1.1 1A13 13 0 013.5 4.1 1 1 0 014.5 3z"
-        stroke="currentColor"
-        strokeWidth="1.4"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function LeadCockpitCard({ lead, rank }: { lead: Lead; rank: number }) {
-  const why = lead.scoreReasons.filter((r) => r.delta > 0).slice(0, 3).map((r) => r.label);
-  const interest = lead.interests[0] ?? 'unknown';
-  return (
-    <article className="group relative bg-card border border-line rounded-eloLg p-5 hover:border-lineStrong hover:shadow-elo transition-all flex flex-col">
-      <div className="absolute -top-2.5 left-4 flex items-center gap-2">
-        <span className="inline-flex items-center justify-center size-6 rounded-full bg-gradient-to-br from-cyan to-cyanDeep text-[#05201d] text-[12px] font-bold tabular-nums shadow-[0_4px_14px_rgba(57,216,232,0.35)]">
-          {rank}
-        </span>
-        {lead.isDemo && (
-          <span className="inline-flex items-center h-5 px-2 rounded-full bg-gold/12 border border-gold/30 text-gold2 text-[10px] uppercase tracking-[0.14em] font-semibold">
-            Demo
-          </span>
+            <div className="ops-card p-5">
+              <h2 className="font-display text-[16px] text-[var(--ops-text)]">Abschlüsse / Provision</h2>
+              <ul className="mt-3 space-y-2 text-[13px] text-[var(--ops-text-2)]">
+                <li className="flex justify-between">
+                  <span>Gemeldet (offen)</span>
+                  <span className="tabular-nums text-[var(--ops-text)]">
+                    {allDeals.filter((d) => d.status === 'reported' || d.status === 'review').length}
+                  </span>
+                </li>
+                <li className="flex justify-between">
+                  <span>Bestätigt</span>
+                  <span className="tabular-nums text-[var(--ops-success)]">
+                    {allDeals.filter((d) => d.status === 'confirmed').length}
+                  </span>
+                </li>
+                <li className="flex justify-between">
+                  <span>Provisionen offen</span>
+                  <span className="tabular-nums text-[var(--ops-gold)]">{fmtEur(openCommission)}</span>
+                </li>
+              </ul>
+            </div>
+          </aside>
         )}
       </div>
-
-      <header className="flex items-start gap-3 pt-1.5">
-        <LeadColorBadge color={lead.leadColor} />
-        <div className="flex-1 min-w-0">
-          <div className="text-[15.5px] font-semibold text-ink truncate">
-            {lead.firstName} {lead.lastName}
-          </div>
-          <div className="text-[12.5px] text-muted truncate">
-            {lead.postalCode} {lead.city ?? ''} · {INTEREST_LABEL[interest] ?? interest}
-            {lead.customerType !== 'unknown' ? ` · ${TYPE_LABEL[lead.customerType]}` : ''}
-          </div>
-        </div>
-        <Badge tone="neutral" className="tabular-nums">
-          {lead.leadScore}
-        </Badge>
-      </header>
-
-      <div className="mt-4 rounded-elo bg-sage/[0.06] border border-sage/20 px-4 py-3">
-        <div className="text-[11px] uppercase tracking-[0.14em] text-sage font-semibold">
-          Nächste Aktion
-        </div>
-        <p className="mt-1 text-[14px] text-ink leading-snug">{lead.recommendedAction}</p>
-      </div>
-
-      {why.length > 0 && (
-        <div className="mt-3">
-          <div className="text-[11px] uppercase tracking-[0.14em] text-muted font-semibold">
-            Warum wichtig
-          </div>
-          <ul className="mt-1.5 space-y-1">
-            {why.map((w) => (
-              <li key={w} className="text-[13px] text-ink2 leading-snug flex items-start gap-2">
-                <span aria-hidden className="mt-1.5 size-1 rounded-full bg-sage shrink-0" />
-                <span>{w}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      <div className="mt-3 flex items-center gap-2 flex-wrap">
-        <ContactBadge preference={lead.contactPreference} />
-        <ConsentBadge legalBasis={lead.legalBasis} />
-        <span className="text-[12px] text-muted ml-auto">{relativeTime(lead.createdAt)}</span>
-      </div>
-
-      <footer className="mt-4 pt-4 border-t border-line flex items-center gap-2">
-        {lead.phone ? (
-          <a
-            href={`tel:${lead.phone.replace(/\s/g, '')}`}
-            className="inline-flex items-center justify-center gap-1.5 h-9 px-3.5 rounded-elo bg-sage text-paper text-[13.5px] font-semibold hover:bg-sage2 transition-colors"
-          >
-            <CallIcon />
-            Anrufen
-          </a>
-        ) : lead.email ? (
-          <a
-            href={`mailto:${lead.email}`}
-            className="inline-flex items-center justify-center h-9 px-3.5 rounded-elo bg-sage text-paper text-[13.5px] font-semibold hover:bg-sage2 transition-colors"
-          >
-            E-Mail
-          </a>
-        ) : null}
-        <Link
-          href={`/admin/leads/${lead.id}`}
-          className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-elo border border-line bg-card text-ink text-[13.5px] font-semibold hover:border-lineStrong hover:bg-paper2/60 transition-colors ml-auto"
-        >
-          Details
-          <span aria-hidden className="transition-transform group-hover:translate-x-0.5">→</span>
-        </Link>
-      </footer>
-    </article>
-  );
-}
-
-function CompactLeadRow({ lead, blocked = false }: { lead: Lead; blocked?: boolean }) {
-  return (
-    <Link
-      href={`/admin/leads/${lead.id}`}
-      className="grid grid-cols-[auto_1fr_auto] items-center gap-4 px-5 py-3.5 hover:bg-paper2/40 transition-colors"
-    >
-      <LeadColorBadge color={lead.leadColor} />
-      <div className="min-w-0">
-        <div className="text-[14.5px] font-semibold text-ink truncate">
-          {lead.firstName} {lead.lastName}
-          {lead.isDemo && (
-            <span className="ml-2 text-[10.5px] uppercase tracking-[0.14em] text-gold2">Demo</span>
-          )}
-        </div>
-        <div className="text-[12.5px] text-muted truncate">
-          {blocked ? (
-            <>
-              <span className="text-leadRed font-medium">Kontakt nicht freigegeben</span> ·{' '}
-              {lead.legalBasis}
-            </>
-          ) : (
-            lead.recommendedAction
-          )}
-        </div>
-      </div>
-      <div className="flex items-center gap-3 shrink-0">
-        <Badge tone="neutral" className="tabular-nums">
-          {lead.leadScore}
-        </Badge>
-        <span aria-hidden className="text-muted">→</span>
-      </div>
-    </Link>
+    </div>
   );
 }

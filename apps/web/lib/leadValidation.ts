@@ -11,6 +11,7 @@ export interface LeadFormInput {
   phone: string;
   email: string;
   zip: string;
+  annualConsumptionKwh: string;
   file: File | null;
   consent: boolean;
 }
@@ -42,9 +43,17 @@ export function validateLeadForm(input: LeadFormInput): LeadFormErrors {
     errors.zip = 'Bitte geben Sie PLZ und Ort an (mindestens 4 Zeichen).';
   }
 
-  if (!input.file) {
-    errors.file = 'Bitte laden Sie Ihre Jahresabrechnung hoch (PDF, JPG oder PNG, max. 10 MB).';
-  } else {
+  const kwhRaw = input.annualConsumptionKwh.trim().replace(/\s/g, '').replace(/\./g, '').replace(',', '.');
+  if (kwhRaw.length > 0) {
+    const kwh = Number(kwhRaw);
+    if (!Number.isFinite(kwh) || kwh <= 0) {
+      errors.annualConsumptionKwh = 'Bitte geben Sie einen gültigen Jahresverbrauch in kWh ein.';
+    } else if (kwh > 999_999) {
+      errors.annualConsumptionKwh = 'Bitte prüfen Sie den Jahresverbrauch – der Wert wirkt ungewöhnlich hoch.';
+    }
+  }
+
+  if (input.file) {
     const t = input.file.type.toLowerCase();
     const okType = ALLOWED_TYPES.has(t) || t === 'image/jpg';
     if (!okType) {
@@ -65,18 +74,24 @@ export function validateLeadForm(input: LeadFormInput): LeadFormErrors {
 export function toLeadPayload(input: LeadFormInput): LeadPayload | null {
   const e = validateLeadForm(input);
   if (Object.keys(e).length > 0) return null;
-  const f = input.file!;
-  return {
+  const payload: LeadPayload = {
     category: input.category!,
     name: input.name.trim(),
     phone: input.phone.trim(),
     email: input.email.trim(),
     zip: input.zip.trim(),
-    fileName: f.name,
-    fileType: f.type || 'application/octet-stream',
-    fileSize: f.size,
     consent: input.consent,
     source: 'landingpage-hero',
     createdAt: new Date().toISOString(),
   };
+  const kwhRaw = input.annualConsumptionKwh.trim().replace(/\s/g, '').replace(/\./g, '').replace(',', '.');
+  if (kwhRaw.length > 0) {
+    payload.annualConsumptionKwh = Math.round(Number(kwhRaw));
+  }
+  if (input.file) {
+    payload.fileName = input.file.name;
+    payload.fileType = input.file.type || 'application/octet-stream';
+    payload.fileSize = input.file.size;
+  }
+  return payload;
 }

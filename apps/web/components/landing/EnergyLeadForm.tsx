@@ -42,6 +42,7 @@ export function EnergyLeadForm({
   const [phone, setPhone] = React.useState('');
   const [email, setEmail] = React.useState('');
   const [zip, setZip] = React.useState('');
+  const [annualConsumptionKwh, setAnnualConsumptionKwh] = React.useState('');
   const [file, setFile] = React.useState<File | null>(null);
   const [consent, setConsent] = React.useState(false);
   const [status, setStatus] = React.useState<SubmitStatus>('idle');
@@ -70,6 +71,7 @@ export function EnergyLeadForm({
     setPhone('');
     setEmail('');
     setZip('');
+    setAnnualConsumptionKwh('');
     setFile(null);
     setConsent(false);
     setErrors({});
@@ -79,7 +81,7 @@ export function EnergyLeadForm({
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setStatus('validating');
-    const input = { category, name, phone, email, zip, file, consent };
+    const input = { category, name, phone, email, zip, annualConsumptionKwh, file, consent };
     const next = validateLeadForm(input);
     setErrors(next);
     if (Object.keys(next).length > 0) {
@@ -165,57 +167,69 @@ export function EnergyLeadForm({
             )}
           </div>
 
-          {/* Upload – kompakter Premium-Drop */}
-          <div className="mb-[18px]">
-            <UploadDropzone file={file} onFile={setFile} error={errors.file} disabled={locked} />
-            <p className="mt-2 flex items-start gap-2 text-[12px] text-slate leading-[1.45]">
-              <ShieldIcon />
-              <span>{c.uploadTrustLine}</span>
-            </p>
-          </div>
+          {/* Kontaktdaten + optionaler Upload dezent daneben */}
+          <div className="grid gap-3 lg:grid-cols-[1fr_minmax(220px,0.72fr)] lg:items-start lg:gap-4 mb-[14px]">
+            <div className="grid sm:grid-cols-2 gap-3">
+              <Field
+                label="Name"
+                autoComplete="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                error={errors.name}
+                disabled={locked}
+                required
+              />
+              <Field
+                label="Telefonnummer"
+                type="tel"
+                inputMode="tel"
+                autoComplete="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                error={errors.phone}
+                disabled={locked}
+                required
+              />
+              <Field
+                label="E-Mail-Adresse"
+                type="email"
+                inputMode="email"
+                autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                error={errors.email}
+                disabled={locked}
+                required
+              />
+              <Field
+                label="PLZ"
+                autoComplete="postal-code"
+                value={zip}
+                onChange={(e) => setZip(e.target.value)}
+                error={errors.zip}
+                disabled={locked}
+                required
+              />
+              <Field
+                label={c.annualConsumptionLabel}
+                type="text"
+                inputMode="numeric"
+                placeholder={c.annualConsumptionPlaceholder}
+                value={annualConsumptionKwh}
+                onChange={(e) => setAnnualConsumptionKwh(e.target.value)}
+                error={errors.annualConsumptionKwh}
+                disabled={locked}
+              />
+            </div>
 
-          {/* 2-spaltige Eingabefelder */}
-          <div className="grid sm:grid-cols-2 gap-3">
-            <Field
-              label="Name"
-              autoComplete="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              error={errors.name}
-              disabled={locked}
-              required
-            />
-            <Field
-              label="Telefonnummer"
-              type="tel"
-              inputMode="tel"
-              autoComplete="tel"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              error={errors.phone}
-              disabled={locked}
-              required
-            />
-            <Field
-              label="E-Mail-Adresse"
-              type="email"
-              inputMode="email"
-              autoComplete="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              error={errors.email}
-              disabled={locked}
-              required
-            />
-            <Field
-              label="PLZ"
-              autoComplete="postal-code"
-              value={zip}
-              onChange={(e) => setZip(e.target.value)}
-              error={errors.zip}
-              disabled={locked}
-              required
-            />
+            <div className="lg:pt-[26px]">
+              <UploadDropzone file={file} onFile={setFile} error={errors.file} disabled={locked} />
+              <p className="mt-2 text-[10.5px] text-slate/95 leading-[1.45]">{c.uploadOfferHint}</p>
+              <p className="mt-1.5 flex items-start gap-1.5 text-[10.5px] text-slate/80 leading-[1.4]">
+                <ShieldIcon />
+                <span>{c.uploadTrustLine}</span>
+              </p>
+            </div>
           </div>
 
           <div className="mt-[14px] mb-[16px]">
