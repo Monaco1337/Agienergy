@@ -30,33 +30,35 @@ export function ConsentBanner() {
   if (pathname?.startsWith('/admin')) return null;
   if (!show) return null;
 
+  const accept = () => {
+    write(`${VERSION}|essential`);
+    setShow(false);
+  };
+
   return (
     <div
       role="dialog"
       aria-live="polite"
       aria-label="Hinweis zur Datenverarbeitung"
-      className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:max-w-md z-50"
+      className="fixed inset-x-3 z-[70] sm:inset-x-auto sm:left-auto sm:right-4 sm:max-w-md"
+      style={{ bottom: 'max(env(safe-area-inset-bottom), 0.75rem)' }}
     >
-      <div className="bg-card border border-borderLight rounded-eloLg shadow-premium p-5">
-        <p className="text-[14px] text-navy leading-relaxed">
-          Diese Seite verwendet ausschließlich technisch notwendige Cookies. Wir nutzen keine externen
+      <div className="bg-card border border-borderLight rounded-eloLg shadow-premium p-4 sm:p-5">
+        <p className="text-[13.5px] sm:text-[14px] text-navy leading-relaxed">
+          Diese Seite verwendet ausschließlich technisch notwendige Cookies – keine externen
           Marketing-Tracker. Mehr in unseren{' '}
           <a href="/datenschutz" className="text-premiumBlue font-medium underline underline-offset-4">
             Datenschutzhinweisen
           </a>
           .
         </p>
-        <div className="mt-4 flex gap-2 justify-end">
-          <button
-            onClick={() => {
-              write(`${VERSION}|essential`);
-              setShow(false);
-            }}
-            className="h-11 min-w-[100px] px-4 rounded-elo bg-gradient-to-br from-energyGreen to-premiumBlue text-white text-[14px] font-semibold shadow-lift hover:shadow-premium transition-shadow"
-          >
-            Verstanden
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={accept}
+          className="mt-4 h-12 w-full px-4 rounded-elo bg-gradient-to-br from-energyGreen to-premiumBlue text-white text-[15px] font-semibold shadow-lift hover:shadow-premium active:scale-[0.99] transition"
+        >
+          Verstanden
+        </button>
       </div>
     </div>
   );
