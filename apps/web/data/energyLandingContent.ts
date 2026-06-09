@@ -94,7 +94,7 @@ export const energyLandingContent = {
       },
       {
         title: 'Klare Rückmeldung',
-        text: 'Sie erhalten eine verständliche Einschätzung statt unübersichtlicher Tariflisten.',
+        text: 'Sie werden persönlich per Telefon oder E-Mail kontaktiert und erhalten eine verständliche Einschätzung – statt unübersichtlicher Tariflisten.',
       },
     ],
   },
