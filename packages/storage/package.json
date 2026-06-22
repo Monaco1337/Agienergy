@@ -12,8 +12,8 @@
   },
   "dependencies": {
     "@elo/core": "workspace:*",
-    "@vercel/blob": "^2.4.0",
-    "pg": "^8.13.1"
+    "@vercel/blob": "^2.4.1",
+    "pg": "^8.22.0"
   },
   "devDependencies": {
     "@types/node": "^22.9.0",
