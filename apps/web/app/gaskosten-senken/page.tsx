@@ -1,14 +1,26 @@
+import type { Metadata } from 'next';
 import { TopicLeadShell } from '@/components/landing/TopicLeadShell';
 import { TopicEditorialBand } from '@/components/landing/TopicEditorialBand';
+import { jsonLdScriptProps, serviceSchema } from '@/lib/seoSchemas';
 
-export const metadata = {
+const PATH = '/gaskosten-senken';
+
+export const metadata: Metadata = {
   title: 'Gaskosten senken – persönlich geprüft',
   description:
     'Wir prüfen, ob bei Ihren Gaskosten Einsparpotenzial besteht. Verständlich, unverbindlich, ohne Verkaufsdruck.',
+  alternates: { canonical: PATH },
 };
 
 export default function GasPage() {
   return (
+    <>
+    <script {...jsonLdScriptProps(serviceSchema({
+      path: PATH,
+      name: 'Persönliche Gaskosten-Prüfung',
+      description: 'Persönliche Prüfung Ihrer Gaskosten anhand Verbrauch und Vertrag.',
+      serviceType: 'Gaskosten-Prüfung',
+    }))} />
     <TopicLeadShell
       eyebrow="Gas"
       h1="Gaskosten senken – verständlich geprüft."
@@ -40,5 +52,6 @@ export default function GasPage() {
         ]}
       />
     </TopicLeadShell>
+    </>
   );
 }

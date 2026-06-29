@@ -2,6 +2,11 @@ import type { Metadata, Viewport } from 'next';
 import { Inter, Manrope } from 'next/font/google';
 import { cookies } from 'next/headers';
 import { ConsentBanner } from '@/components/landing/ConsentBanner';
+import {
+  jsonLdScriptProps,
+  organizationSchema,
+  webSiteSchema,
+} from '@/lib/seoSchemas';
 import './globals.css';
 
 const inter = Inter({
@@ -17,7 +22,12 @@ const display = Manrope({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'),
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ??
+      (process.env.NODE_ENV === 'production'
+        ? 'https://www.agienergy.de'
+        : 'http://localhost:3000'),
+  ),
   title: {
     default: 'Energie-Tarifprüfung für Strom, Gas, Solar & Gewerbe | AGI Energy',
     template: '%s | AGI Energy',
@@ -31,12 +41,30 @@ export const metadata: Metadata = {
     statusBarStyle: 'black-translucent',
   },
   robots: { index: true, follow: true },
+  alternates: {
+    canonical: '/',
+  },
   openGraph: {
     type: 'website',
     locale: 'de_DE',
-    title: 'Energie-Tarifprüfung für Strom, Gas, Solar & Gewerbe',
+    siteName: 'AGI Energy',
+    title: 'Persönliche Energieprüfung statt anonymer Tarifportale',
     description:
-      'Jahresabrechnung hochladen – persönliche Prüfung statt Tarifchaos. Verständlich, zweckgebunden und DSGVO-orientiert.',
+      'Strom, Gas, Photovoltaik, Jahresabrechnung und Gewerbeenergie – persönlich geprüft, ohne automatische Vertragsumstellung. DSGVO-konform, EU-Server.',
+    images: [
+      {
+        url: '/icon-512',
+        width: 512,
+        height: 512,
+        alt: 'AGI Energy',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary',
+    title: 'AGI Energy – persönliche Energieprüfung',
+    description:
+      'Strom, Gas, Photovoltaik und Gewerbeenergie persönlich prüfen lassen. Ohne automatische Vertragsumstellung.',
   },
 };
 
@@ -51,6 +79,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const comfort = c.get('comfort')?.value === '1' ? '1' : '0';
   return (
     <html lang="de" data-comfort={comfort} className={`${inter.variable} ${display.variable}`}>
+      <head>
+        <script {...jsonLdScriptProps(organizationSchema())} />
+        <script {...jsonLdScriptProps(webSiteSchema())} />
+      </head>
       <body className="min-h-screen bg-softWhite text-navy antialiased font-sans">
         {children}
         <ConsentBanner />

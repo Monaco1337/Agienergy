@@ -1,14 +1,27 @@
+import type { Metadata } from 'next';
 import { TopicLeadShell } from '@/components/landing/TopicLeadShell';
 import { TopicEditorialBand } from '@/components/landing/TopicEditorialBand';
+import { jsonLdScriptProps, serviceSchema } from '@/lib/seoSchemas';
 
-export const metadata = {
+const PATH = '/photovoltaik-beratung';
+
+export const metadata: Metadata = {
   title: 'Photovoltaik-Beratung – wirtschaftlich geprüft',
   description:
     'Wir prüfen, ob Photovoltaik für Ihr Gebäude wirtschaftlich sinnvoll sein kann – ehrlich, ohne Werbeversprechen.',
+  alternates: { canonical: PATH },
 };
 
 export default function PVPage() {
   return (
+    <>
+    <script {...jsonLdScriptProps(serviceSchema({
+      path: PATH,
+      name: 'Photovoltaik-Wirtschaftlichkeitsprüfung',
+      description:
+        'Ergebnisoffene Wirtschaftlichkeitsprüfung einer Photovoltaikanlage anhand Dach, Verbrauch und Vertragsdetails.',
+      serviceType: 'Photovoltaik-Beratung',
+    }))} />
     <TopicLeadShell
       eyebrow="Photovoltaik"
       h1="Photovoltaik-Beratung – wirtschaftlich geprüft."
@@ -36,5 +49,6 @@ export default function PVPage() {
         ]}
       />
     </TopicLeadShell>
+    </>
   );
 }

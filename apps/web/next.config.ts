@@ -7,6 +7,15 @@ const nextConfig: NextConfig = {
     typedRoutes: false,
   },
   transpilePackages: ['@elo/ui', '@elo/core', '@elo/scoring', '@elo/storage', '@elo/mail', '@elo/audit', '@elo/experiments'],
+  async redirects() {
+    return [
+      // SEO-Synonyme aus dem 7-Tage-Plan → vermeiden Duplicate-Content,
+      // bündeln Ranking-Signal auf die kanonische Landingpage.
+      { source: '/energiepruefung', destination: '/energiecheck', permanent: true },
+      { source: '/photovoltaik-pruefen', destination: '/photovoltaik-beratung', permanent: true },
+      { source: '/gewerbeenergie-pruefen', destination: '/gewerbe-energiecheck', permanent: true },
+    ];
+  },
   async headers() {
     return [
       {

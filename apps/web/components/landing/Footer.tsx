@@ -60,12 +60,12 @@ export function Footer() {
           relative mx-auto max-w-[1440px]
           px-5 sm:px-8 lg:px-12
           pt-20 sm:pt-24 lg:pt-[112px] pb-12
-          grid gap-12 lg:gap-16
+          grid gap-12 lg:gap-14
           sm:grid-cols-2 lg:grid-cols-12
         "
       >
         {/* Brand-Spalte */}
-        <div className="sm:col-span-2 lg:col-span-5 max-w-md">
+        <div className="sm:col-span-2 lg:col-span-4 max-w-md">
           <Logo variant="wordmark" size="lg" onDark />
           <p className="mt-6 text-[12px] uppercase tracking-[0.22em] font-medium text-[rgba(245,250,255,0.42)]">
             Persönlich. Transparent. Zukunftssicher.
@@ -77,7 +77,7 @@ export function Footer() {
         </div>
 
         {/* Bereiche */}
-        <nav aria-label="Bereiche" className="lg:col-span-3">
+        <nav aria-label="Bereiche" className="lg:col-span-2">
           <h4 className={headingCls}>Bereiche</h4>
           <ul className="mt-6 space-y-[14px]">
             <li>
@@ -101,6 +101,37 @@ export function Footer() {
             <li>
               <Link className={`${linkCls} group`} href="/gewerbe-energiecheck">
                 Gewerbe-Energie-Check
+                <ArrowIcon />
+              </Link>
+            </li>
+          </ul>
+        </nav>
+
+        {/* Schnellprüfung */}
+        <nav aria-label="Schnellprüfung" className="lg:col-span-2">
+          <h4 className={headingCls}>Schnellprüfung</h4>
+          <ul className="mt-6 space-y-[14px]">
+            <li>
+              <Link className={`${linkCls} group`} href="/jahresabrechnung-pruefen">
+                Jahresabrechnung
+                <ArrowIcon />
+              </Link>
+            </li>
+            <li>
+              <Link className={`${linkCls} group`} href="/stromvertrag-pruefen">
+                Stromvertrag
+                <ArrowIcon />
+              </Link>
+            </li>
+            <li>
+              <Link className={`${linkCls} group`} href="/gasvertrag-pruefen">
+                Gasvertrag
+                <ArrowIcon />
+              </Link>
+            </li>
+            <li>
+              <Link className={`${linkCls} group`} href="/anbieterwechsel-pruefen">
+                Anbieterwechsel
                 <ArrowIcon />
               </Link>
             </li>

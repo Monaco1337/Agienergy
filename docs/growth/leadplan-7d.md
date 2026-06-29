@@ -1264,9 +1264,105 @@ Drop-Off pro Stufe als Prozent + absolut.
 - Lead-Routing: `apps/web/lib/agi/routing.ts`
 - Lead-Mutations: `apps/web/app/actions/leadMutations.ts`
 - Bestehende Landingpages: `apps/web/app/{stromkosten-senken,gaskosten-senken,photovoltaik-beratung,gewerbe-energiecheck,energieberatung-deutschland,energiecheck}/page.tsx`
-- Sitemap: `apps/web/app/sitemap.ts` (Site-URL via `NEXT_PUBLIC_SITE_URL`)
+- Neue Intent-Landingpages (No-Spend SEO): `apps/web/app/{jahresabrechnung-pruefen,stromvertrag-pruefen,gasvertrag-pruefen,anbieterwechsel-pruefen}/page.tsx`
+- SEO-Schemas (Organization, Service, FAQ, Breadcrumb): `apps/web/lib/seoSchemas.ts`
+- Sitemap: `apps/web/app/sitemap.ts` (Site-URL haerter verankert auf agienergy.de)
 - Robots: `apps/web/app/robots.ts`
 - Consent-Modal: `apps/web/components/landing/ConsentBanner.tsx`
 - Operations Center: `apps/web/app/admin/(authed)/*`
+
+---
+
+## Anhang B: No-Spend-Modus - Realistischer Pfad ohne Werbebudget
+
+> Stand der Entscheidung: kein Werbebudget verfuegbar. Dieser Anhang ueberschreibt die Budget-Annahmen aus Abschnitt 1-3.
+
+### B1. Ehrliche Korrektur der Zielgroesse
+
+**1.000 Leads/Woche sind ohne Paid-Spend nicht in absehbarer Zeit erreichbar.** Wer das verspricht, luegt.
+
+Realistischer Korridor ohne Werbebudget:
+
+| Zeitraum | Erwartung qualifizierter Leads/Woche | Voraussetzungen |
+|---|---|---|
+| Woche 1-2 | 5-20 | LP-Hygiene, Google Search Console, GMB-Eintrag, 5 Partner-Posts/Woche, klassischer Direkt-Traffic + Mund-zu-Mund |
+| Woche 3-4 | 15-40 | Erste organische Indexierung greift, 4 neue Intent-LPs ranken auf Long-Tail, Partner-Empfehlungen laufen an |
+| Monat 2 | 40-120 | Topical Authority sichtbar, FAQ-Rich-Snippets in den SERPs, 2-3 Partnerschaften aktiv |
+| Monat 3 | 80-200 | SEO-Hauptkurve greift, Newsletter-Liste auf ~500-1.500, Empfehlungsschleife aktiv |
+| Monat 4-6 | 150-400 | Marken-Suchvolumen waechst, Bestandskunden-Empfehlungen werden zur staerksten Quelle |
+
+**Wann waeren ueberhaupt 500-1.000 Leads/Woche ohne Spend denkbar?** Frueheste sinnvolle Annahme: Monat 8-12, *und nur* mit konsistent veroeffentlichten Inhalten (mind. 2 Artikel/Woche), aktivem Partnernetz (10+ Partner), Lokalpresse-Erwaehnungen und systematischer Bestandskunden-Aktivierung. Vorher ist es nicht serioes.
+
+### B2. Was im Code bereits gebaut wurde (No-Spend-relevant)
+
+- **4 neue SEO-Intent-LPs** mit Service-Schema und FAQ-Schema:
+  - `/jahresabrechnung-pruefen` - hochintentes Volumen, Saisonpeak Q1
+  - `/stromvertrag-pruefen` - Vertragspruefungs-Intent
+  - `/gasvertrag-pruefen` - Vertragspruefungs-Intent
+  - `/anbieterwechsel-pruefen` - Wechsel-Intent
+- **Bestehende Topic-LPs** mit Canonical + Service-Schema nachgeruestet (Strom, Gas, PV, Gewerbe, Energiecheck).
+- **301-Redirects** fuer Synonym-URLs (`/energiepruefung`, `/photovoltaik-pruefen`, `/gewerbeenergie-pruefen`) - vermeidet Duplicate-Content, buendelt Ranking-Signal.
+- **Globales Organization + WebSite JSON-LD** im Root-Layout - Voraussetzung fuer Sitelinks und Knowledge-Panel.
+- **OpenGraph + Twitter-Card-Defaults** - jeder Share wirkt sauber, ohne dass jemand etwas tun muss.
+- **Sitemap auf Default-URL `https://www.agienergy.de` haerter verankert** - Search-Console-Problem (vorher `localhost`) ist auch ohne Vercel-Env gefixt.
+- **Footer-Block "Schnellprüfung"** verlinkt die 4 neuen LPs sitewide - massiver Internal-Linking-Effekt.
+
+### B3. Was der Inhaber/Betreiber manuell tun muss (kein Code, je 30-60 Min)
+
+| Aktion | Aufwand | Wirkung |
+|---|---:|---|
+| Google Search Console: Property fuer `https://www.agienergy.de` anlegen, Sitemap einreichen | 20 Min | Indexierung, Ranking-Diagnose |
+| Google Business Profile (kostenlos) fuer AGI Energy anlegen, Region/Branche/Beschreibung pflegen | 30 Min | Local-Pack-Sichtbarkeit, Brand-Treffer |
+| Bing Webmaster Tools: Property anlegen, Sitemap einreichen | 10 Min | ~6-10 % zusaetzlicher organischer Traffic |
+| LinkedIn Unternehmensseite mit klarer Positionierung + 1 Post/Woche (Owner persoenlich) | 30 Min Setup + 15 Min/Woche | B2B-Trust, organische Reichweite ohne Spend |
+| Bestandskunden-Empfehlungs-E-Mail: 1x raus, persoenlich formuliert, 1 Frage: "Wer in deinem Umfeld haette gerade eine Strom-/Gasabrechnung, die wir pruefen sollen?" | 60 Min | Konvertiert deutlich besser als jede Anzeige |
+| 3-5 lokale Multiplikatoren ansprechen (Steuerberater, Handwerker, Wohnungsverwalter): "Wir pruefen kostenlos die Energieabrechnung euerer Kunden, wenn ihr es weiterempfehlt" | 1-2 h | Klassische Empfehlungspartnerschaft, nachhaltigste Lead-Quelle |
+| Eine Pressemeldung an 5-10 Regionalmedien (Idee: "Was Verbraucher bei der Jahresabrechnung uebersehen") | 2-3 h | 1-2 redaktionelle Erwaehnungen reichen fuer Authority + organischen Traffic |
+
+### B4. Konkrete No-Spend-Wochenroutine (realistisch, durchhaltbar)
+
+**Montag (60 Min):**
+- 1 LinkedIn-Post (Mini-Case: "Wir haben heute bei Familie X einen Abschlag um 22 % reduziert - hier ist, was wir geprueft haben")
+- Kurzer Check Search Console (Klicks, Impressionen)
+
+**Dienstag (45 Min):**
+- 1 kurzer Blog-/Ratgeber-Artikel (200-400 Wo., einfach gehalten) zu einem Long-Tail-Thema. Ziele: "Stromabrechnung Nachzahlung Begruendung pruefen", "Gasanbieterwechsel sinnvoll 2026", "Photovoltaik Eigenheim Wirtschaftlichkeit Berechnung".
+- Im Footer verlinken oder als Beitrag in neuer Route `/ratgeber/[slug]` (kann spaeter ergaenzt werden).
+
+**Mittwoch (30 Min):**
+- 1 Multiplikator ansprechen (Steuerberater/Verwalter/Handwerker per E-Mail oder LinkedIn).
+
+**Donnerstag (45 Min):**
+- 1 Empfehlungs-Bitte an 2-3 zufriedene Bestandskunden, persoenlich.
+
+**Freitag (30 Min):**
+- KPI-Stand: Wieviele Leads kamen, woher? Welche Suchbegriffe in der Console wachsen? Was hat funktioniert?
+
+**Wochenende:** Ruhe. Burnout-Schutz. Lead-Bearbeitung am Montag mit klarem Kopf.
+
+### B5. KPI fuer No-Spend (anders als die Paid-KPIs in Abschnitt 16)
+
+| KPI | Ziel Monat 1 | Ziel Monat 3 | Ziel Monat 6 |
+|---|---:|---:|---:|
+| Organische Klicks/Tag (GSC) | 5-15 | 30-60 | 80-200 |
+| Indexierte Seiten | 10-15 | 25-40 | 50-100 |
+| Backlinks (organisch + Partner) | 3-8 | 15-30 | 40-80 |
+| Empfehlungsleads/Woche | 1-3 | 5-10 | 15-30 |
+| Conversion-Rate LP -> Lead | 3-5 % | 5-8 % | 7-12 % |
+| Bearbeitungs-Reaktionszeit (Stunden) | <4 | <2 | <1 |
+
+### B6. Was du NICHT tun solltest, weil es Substanz kostet
+
+- Massen-Outreach ohne Doppel-Opt-In (UWG-Risiko, Spam-Reputation).
+- Gekaufte Backlinks (Google-Penalty-Risiko, Geldverbrennung).
+- Lead-Listen kaufen (rechtlich heikel, Conversion bei <0,5 %).
+- Aggressive "Garantiert Sparen"-Headlines (UWG, Vertrauensschaden).
+- Push-Notifications, Pop-ups, Exit-Intent-Modals - schreckt Premium-Zielgruppe ab.
+
+### B7. Bedingung fuer den naechsten Schritt
+
+Sobald die organische Pipeline stabil **30-60 Leads/Woche** liefert UND die Bearbeitung in <2 h Reaktionszeit laeuft, lohnt sich der Einstieg in kleinen, kontrollierten Paid-Spend (Abschnitt 3, Szenario C). Vorher ist Werbebudget verschwendetes Geld, weil das Bottleneck im Funnel und in der Bearbeitung sitzt, nicht im Traffic.
+
+**Klar formuliert:** Ohne Paid-Spend ist 1.000 Leads/Woche kein realistisches Quartalsziel. Was realistisch ist: ein gesundes, organisches Fundament, das in 4-6 Monaten 150-400 Leads/Woche liefert - das sind 8.000-20.000 qualifizierte Leads im Jahr, ohne einen Euro Werbung. Damit kann man arbeiten.
 
 

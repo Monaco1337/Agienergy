@@ -1,14 +1,27 @@
+import type { Metadata } from 'next';
 import { TopicLeadShell } from '@/components/landing/TopicLeadShell';
 import { TopicEditorialBand } from '@/components/landing/TopicEditorialBand';
+import { jsonLdScriptProps, serviceSchema } from '@/lib/seoSchemas';
 
-export const metadata = {
-  title: 'Gewerbe-Energie-Check',
+const PATH = '/gewerbe-energiecheck';
+
+export const metadata: Metadata = {
+  title: 'Gewerbe-Energie-Check – Strom, Gas und PV für Unternehmen',
   description:
     'Energie-Check für Unternehmen: Strom, Gas und PV-Potenziale für Ihren Standort verständlich geprüft.',
+  alternates: { canonical: PATH },
 };
 
 export default function GewerbePage() {
   return (
+    <>
+    <script {...jsonLdScriptProps(serviceSchema({
+      path: PATH,
+      name: 'Energie-Check für Unternehmen',
+      description:
+        'Persönliche Prüfung von Strom, Gas und Photovoltaik-Potenzial für Unternehmen und Gewerbe.',
+      serviceType: 'Gewerbe-Energieberatung',
+    }))} />
     <TopicLeadShell
       eyebrow="Gewerbe"
       h1="Gewerbe-Energie-Check"
@@ -36,5 +49,6 @@ export default function GewerbePage() {
         ]}
       />
     </TopicLeadShell>
+    </>
   );
 }

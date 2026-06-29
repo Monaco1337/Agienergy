@@ -1,14 +1,26 @@
+import type { Metadata } from 'next';
 import { TopicLeadShell } from '@/components/landing/TopicLeadShell';
 import { TopicEditorialBand } from '@/components/landing/TopicEditorialBand';
+import { jsonLdScriptProps, serviceSchema } from '@/lib/seoSchemas';
 
-export const metadata = {
+const PATH = '/stromkosten-senken';
+
+export const metadata: Metadata = {
   title: 'Stromkosten senken – persönlich geprüft',
   description:
     'Wir prüfen, ob bei Ihren Stromkosten Einsparpotenzial besteht. Verständlich, unverbindlich, ohne Verkaufsdruck.',
+  alternates: { canonical: PATH },
 };
 
 export default function StromPage() {
   return (
+    <>
+    <script {...jsonLdScriptProps(serviceSchema({
+      path: PATH,
+      name: 'Persönliche Stromkosten-Prüfung',
+      description: 'Persönliche Prüfung Ihrer Stromkosten anhand Verbrauch und Vertrag.',
+      serviceType: 'Stromkosten-Prüfung',
+    }))} />
     <TopicLeadShell
       eyebrow="Strom"
       h1="Stromkosten senken – ehrlich geprüft."
@@ -40,5 +52,6 @@ export default function StromPage() {
         ]}
       />
     </TopicLeadShell>
+    </>
   );
 }

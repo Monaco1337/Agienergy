@@ -11,7 +11,16 @@ const optUrl = emptyToUndef.pipe(z.string().url().optional());
 
 const schema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
-  NEXT_PUBLIC_SITE_URL: emptyToUndef.pipe(z.string().url().default('http://localhost:3000')),
+  NEXT_PUBLIC_SITE_URL: emptyToUndef.pipe(
+    z
+      .string()
+      .url()
+      .default(
+        process.env.NODE_ENV === 'production'
+          ? 'https://www.agienergy.de'
+          : 'http://localhost:3000',
+      ),
+  ),
 
   STORAGE_DRIVER: z.enum(['json', 'supabase', 'blob', 'postgres']).optional(),
   STORAGE_BLOB_PATHNAME: optStr,
