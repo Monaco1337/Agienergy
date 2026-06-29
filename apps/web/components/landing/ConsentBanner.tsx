@@ -4,7 +4,11 @@ import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 
 const COOKIE = 'elo_consent';
-const VERSION = '2025-01-01';
+const VERSION = '2026-06-29';
+/** Custom-Event, das vom Footer-Link „Cookie-Einstellungen" ausgelöst wird */
+export const CONSENT_REOPEN_EVENT = 'agi:consent:reopen';
+
+type Decision = 'essential' | 'rejected';
 
 function read(): string | null {
   if (typeof document === 'undefined') return null;
@@ -12,9 +16,9 @@ function read(): string | null {
   return m ? decodeURIComponent(m.split('=')[1] ?? '') : null;
 }
 
-function write(value: string) {
+function write(decision: Decision) {
   const oneYear = 60 * 60 * 24 * 365;
-  document.cookie = `${COOKIE}=${encodeURIComponent(value)}; max-age=${oneYear}; path=/; samesite=lax`;
+  document.cookie = `${COOKIE}=${encodeURIComponent(`${VERSION}|${decision}`)}; max-age=${oneYear}; path=/; samesite=lax`;
 }
 
 export function ConsentBanner() {
@@ -27,8 +31,13 @@ export function ConsentBanner() {
     if (!v || !v.startsWith(VERSION)) setShow(true);
   }, []);
 
-  // Solange der Consent-Dialog offen ist, Scrollen der Seite sperren –
-  // der Besucher muss zuerst bestätigen.
+  useEffect(() => {
+    if (isAdmin) return;
+    const handler = () => setShow(true);
+    window.addEventListener(CONSENT_REOPEN_EVENT, handler);
+    return () => window.removeEventListener(CONSENT_REOPEN_EVENT, handler);
+  }, [isAdmin]);
+
   useEffect(() => {
     if (show && !isAdmin) {
       const original = document.body.style.overflow;
@@ -39,12 +48,15 @@ export function ConsentBanner() {
     }
   }, [show, isAdmin]);
 
-  // Admin-Bereich ist ein internes Tool – kein Besucher-Consent-Banner.
   if (isAdmin) return null;
   if (!show) return null;
 
   const accept = () => {
-    write(`${VERSION}|essential`);
+    write('essential');
+    setShow(false);
+  };
+  const reject = () => {
+    write('rejected');
     setShow(false);
   };
 
@@ -56,12 +68,10 @@ export function ConsentBanner() {
       aria-describedby="consent-desc"
       className="fixed inset-0 z-[100] flex items-end justify-center p-3 sm:items-center sm:p-6"
     >
-      {/* Backdrop – blockiert die Seite bis zur Bestätigung */}
       <div className="absolute inset-0 bg-navy/75 backdrop-blur-[6px]" aria-hidden />
 
-      {/* Dialog-Karte */}
       <div
-        className="relative w-full max-w-[34rem] rounded-eloLg border border-borderLight bg-card shadow-premium p-5 sm:p-7 animate-[consent-in_.28s_cubic-bezier(0.16,1,0.3,1)]"
+        className="relative w-full max-w-[36rem] rounded-eloLg border border-borderLight bg-card shadow-premium p-5 sm:p-7 animate-[consent-in_.28s_cubic-bezier(0.16,1,0.3,1)]"
         style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 1.25rem)' }}
       >
         <div className="flex items-start gap-4">
@@ -82,21 +92,36 @@ export function ConsentBanner() {
               id="consent-desc"
               className="mt-2 text-[13.5px] sm:text-[14px] text-slate leading-relaxed"
             >
-              Diese Seite verwendet ausschließlich technisch notwendige Cookies – keine externen
-              Marketing-Tracker und kein Tracking zu Werbezwecken. Mit „Akzeptieren" bestätigen Sie
-              die Nutzung. Details finden Sie in den{' '}
+              Wir verwenden ausschließlich technisch notwendige Cookies und
+              funktionale First-Party-Cookies zur Erfolgsmessung unserer eigenen
+              Akquise (UTM-Quelle, Empfehlungscode). <strong>Kein externes
+              Werbe-Tracking</strong>, kein Google Analytics, kein Meta Pixel.
+            </p>
+            <ul className="mt-3 space-y-1.5 text-[13px] text-slate/90">
+              <li>· Essenziell: Session, Consent-Status</li>
+              <li>· Funktional: UTM-First-Touch (30 Tage), Empfehlungscode (60 Tage)</li>
+            </ul>
+            <p className="mt-3 text-[13px] text-slate/80">
+              Details in unseren{' '}
               <a
                 href="/datenschutz"
                 className="text-premiumBlue font-medium underline underline-offset-4"
               >
                 Datenschutzhinweisen
               </a>
-              .
+              . Sie können Ihre Auswahl jederzeit im Footer ändern.
             </p>
           </div>
         </div>
 
         <div className="mt-6 flex flex-col-reverse gap-2.5 sm:flex-row sm:justify-end">
+          <button
+            type="button"
+            onClick={reject}
+            className="inline-flex h-12 sm:h-11 items-center justify-center rounded-elo border border-borderLight px-5 text-[14px] font-medium text-navy transition-colors hover:bg-paper2"
+          >
+            Nur essenzielle
+          </button>
           <a
             href="/datenschutz"
             className="inline-flex h-12 sm:h-11 items-center justify-center rounded-elo border border-borderLight px-5 text-[14px] font-medium text-navy transition-colors hover:bg-paper2"
@@ -109,7 +134,7 @@ export function ConsentBanner() {
             onClick={accept}
             className="inline-flex h-12 sm:h-11 items-center justify-center rounded-elo bg-gradient-to-br from-energyGreen to-premiumBlue px-7 text-[15px] font-semibold text-white shadow-lift transition hover:shadow-premium active:scale-[0.99]"
           >
-            Akzeptieren
+            Alle akzeptieren
           </button>
         </div>
       </div>
@@ -117,4 +142,10 @@ export function ConsentBanner() {
       <style>{`@keyframes consent-in{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:none}}`}</style>
     </div>
   );
+}
+
+/** Hilfsfunktion zum Re-Öffnen des Banners (z. B. via Footer-Link). */
+export function reopenConsent() {
+  if (typeof window === 'undefined') return;
+  window.dispatchEvent(new CustomEvent(CONSENT_REOPEN_EVENT));
 }

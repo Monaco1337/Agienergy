@@ -33,9 +33,14 @@ const STATIC_ENTRIES: SitemapEntry[] = [
   { path: '/energieberatung', priority: 0.75, changeFrequency: 'weekly' },
   { path: '/newsletter', priority: 0.55, changeFrequency: 'monthly' },
 
+  // Kontakt-Seite
+  { path: '/kontakt', priority: 0.65, changeFrequency: 'monthly' },
+
   // Rechtliche Pflicht-/Hilfsseiten
   { path: '/datenschutz', priority: 0.3, changeFrequency: 'yearly' },
   { path: '/impressum', priority: 0.3, changeFrequency: 'yearly' },
+  { path: '/agb', priority: 0.3, changeFrequency: 'yearly' },
+  { path: '/widerruf', priority: 0.3, changeFrequency: 'yearly' },
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {
