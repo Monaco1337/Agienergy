@@ -33,6 +33,7 @@ const schema = z.object({
   fileName: z.string().max(260).optional(),
   fileType: z.string().max(120).optional(),
   fileSize: z.number().nonnegative().optional(),
+  filePathname: z.string().max(300).startsWith('leads/').optional(),
   consent: z.boolean().refine((v) => v === true, { message: 'Einwilligung erforderlich.' }),
   whatsappConsent: z.boolean().optional(),
   partnerForwardingConsent: z.boolean().optional(),
@@ -126,7 +127,7 @@ export async function POST(req: Request) {
   const map = CATEGORY_MAP[d.category];
   const { firstName, lastName } = splitName(d.name);
   const { postalCode, city } = parseZip(d.zip);
-  const hasFile = Boolean(d.fileName);
+  const hasFile = Boolean(d.fileName || d.filePathname);
   const now = nowIso();
 
   const funnelInput = {
@@ -238,9 +239,9 @@ export async function POST(req: Request) {
           {
             id: newId('file'),
             createdAt: now,
-            fileName: d.fileName!,
+            fileName: d.fileName ?? 'Rechnung',
             fileType: d.fileType ?? 'application/octet-stream',
-            fileUrl: '',
+            fileUrl: d.filePathname ?? '',
             category: 'invoice',
           },
         ]

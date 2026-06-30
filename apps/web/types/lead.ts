@@ -17,6 +17,8 @@ export interface LeadPayload {
   fileName?: string;
   fileType?: string;
   fileSize?: number;
+  /** Blob-Pfad der hochgeladenen Datei (siehe /api/upload). */
+  filePathname?: string;
   consent: boolean;
   whatsappConsent?: boolean;
   partnerForwardingConsent?: boolean;

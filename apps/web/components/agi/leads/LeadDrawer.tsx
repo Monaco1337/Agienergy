@@ -506,13 +506,27 @@ export function LeadDrawer({
             <section className="ops-card p-5">
               <h3 className="font-display text-[16px] text-[var(--ops-text)]">Unterlagen</h3>
               <ul className="mt-3 space-y-2 text-[13px]">
-                {lead.files.map((f) => (
-                  <li key={f.id} className="flex items-center gap-2 text-[var(--ops-text-2)]">
-                    <span aria-hidden className="size-1.5 rounded-full bg-[var(--ops-cyan)]" />
-                    <span className="flex-1 truncate">{f.fileName}</span>
-                    <span className="ops-pill">{f.category}</span>
-                  </li>
-                ))}
+                {lead.files.map((f) => {
+                  const downloadable = f.fileUrl && f.fileUrl.startsWith('leads/');
+                  return (
+                    <li key={f.id} className="flex items-center gap-2 text-[var(--ops-text-2)]">
+                      <span aria-hidden className="size-1.5 rounded-full bg-[var(--ops-cyan)]" />
+                      {downloadable ? (
+                        <a
+                          href={`/api/admin/file?path=${encodeURIComponent(f.fileUrl)}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="flex-1 truncate underline underline-offset-2 hover:text-[var(--ops-cyan)]"
+                        >
+                          {f.fileName}
+                        </a>
+                      ) : (
+                        <span className="flex-1 truncate">{f.fileName}</span>
+                      )}
+                      <span className="ops-pill">{f.category}</span>
+                    </li>
+                  );
+                })}
               </ul>
             </section>
           )}

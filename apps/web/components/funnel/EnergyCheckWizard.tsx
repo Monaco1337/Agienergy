@@ -13,10 +13,11 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button, OptionCard, Field, Checkbox } from '@elo/ui';
 import { WizardInstantEstimate } from '@/components/funnel/WizardInstantEstimate';
-import { funnelConfig, visibleSteps } from '@/lib/funnel/config';
+import { visibleSteps } from '@/lib/funnel/config';
 import { audienceFromState } from '@/lib/funnel/audience';
 import { CONSENT_TEXTS, CONSENT_VERSION, PRIVACY_POLICY_VERSION } from '@/lib/consent';
 import { submitLead } from '@/app/actions/submitLead';
+import { uploadLeadFile } from '@/lib/uploadFile';
 import type { AnswerState, FunnelStep, Interest } from '@elo/core';
 
 const STORAGE_KEY = 'elo_funnel_state_v1';
@@ -61,6 +62,8 @@ export function EnergyCheckWizard() {
   const [stepIdx, setStepIdx] = useState(0);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [file, setFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
   const startedAt = useRef<number>(Date.now());
   const hydrated = useRef(false);
 
@@ -133,33 +136,64 @@ export function EnergyCheckWizard() {
       typeof crypto !== 'undefined' && 'randomUUID' in crypto
         ? crypto.randomUUID()
         : `agi-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-    const fd = new FormData();
-    fd.set(
-      'payload',
-      JSON.stringify({
-        state,
-        consentTextVersion: CONSENT_VERSION,
-        privacyPolicyVersion: PRIVACY_POLICY_VERSION,
-        consentTexts: CONSENT_TEXTS,
-        pagePath: window.location.pathname,
-        technicalRequestId,
-        submittedAtMs: elapsed,
-        ...(utm.utmSource ? { utmSource: utm.utmSource } : {}),
-        ...(utm.utmMedium ? { utmMedium: utm.utmMedium } : {}),
-        ...(utm.utmCampaign ? { utmCampaign: utm.utmCampaign } : {}),
-        ...(utm.utmTerm ? { utmTerm: utm.utmTerm } : {}),
-        ...(utm.utmContent ? { utmContent: utm.utmContent } : {}),
-        ...(utm.referrer ? { referrer: utm.referrer } : {}),
-      }),
-    );
     startTransition(async () => {
-      const res = await submitLead(fd);
-      if (res.ok) {
-        sessionStorage.removeItem(STORAGE_KEY);
-        const qs = res.referralCode ? `?ref=${encodeURIComponent(res.referralCode)}` : '';
-        router.push(`/danke${qs}`);
-      } else {
-        setError(res.error ?? 'Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut.');
+      try {
+        let uploaded: { pathname: string; fileName: string; fileType: string } | null = null;
+        if (file) {
+          setUploading(true);
+          try {
+            uploaded = await uploadLeadFile(file);
+          } catch (uploadErr) {
+            setUploading(false);
+            setError(
+              uploadErr instanceof Error
+                ? uploadErr.message
+                : 'Die Datei konnte nicht hochgeladen werden.',
+            );
+            return;
+          }
+          setUploading(false);
+        }
+
+        const fd = new FormData();
+        fd.set(
+          'payload',
+          JSON.stringify({
+            state,
+            consentTextVersion: CONSENT_VERSION,
+            privacyPolicyVersion: PRIVACY_POLICY_VERSION,
+            consentTexts: CONSENT_TEXTS,
+            pagePath: window.location.pathname,
+            technicalRequestId,
+            submittedAtMs: elapsed,
+            ...(uploaded
+              ? {
+                  filePathname: uploaded.pathname,
+                  fileName: uploaded.fileName,
+                  fileType: uploaded.fileType,
+                }
+              : {}),
+            ...(utm.utmSource ? { utmSource: utm.utmSource } : {}),
+            ...(utm.utmMedium ? { utmMedium: utm.utmMedium } : {}),
+            ...(utm.utmCampaign ? { utmCampaign: utm.utmCampaign } : {}),
+            ...(utm.utmTerm ? { utmTerm: utm.utmTerm } : {}),
+            ...(utm.utmContent ? { utmContent: utm.utmContent } : {}),
+            ...(utm.referrer ? { referrer: utm.referrer } : {}),
+          }),
+        );
+
+        const res = await submitLead(fd);
+        if (res.ok) {
+          sessionStorage.removeItem(STORAGE_KEY);
+          const qs = res.referralCode ? `?ref=${encodeURIComponent(res.referralCode)}` : '';
+          router.push(`/danke${qs}`);
+        } else {
+          setError(res.error ?? 'Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut.');
+        }
+      } catch {
+        setError(
+          'Verbindung unterbrochen. Bitte prüfen Sie Ihre Internetverbindung und versuchen Sie es erneut.',
+        );
       }
     });
   }
@@ -235,6 +269,10 @@ export function EnergyCheckWizard() {
             </div>
           )}
 
+          {step.id === 'hasInvoice' && state.hasInvoice === 'upload_now' && (
+            <WizardUpload file={file} onFile={setFile} busy={uploading} />
+          )}
+
           {step.type === 'contact' && <ContactFields state={state} setField={setField} />}
           {step.type === 'consent' && <ConsentFields state={state} setField={setField} />}
         </div>
@@ -269,7 +307,9 @@ export function EnergyCheckWizard() {
             >
               {isLast
                 ? isPending
-                  ? 'Wird gesendet…'
+                  ? uploading
+                    ? 'Datei wird hochgeladen…'
+                    : 'Wird gesendet…'
                   : 'Kostenlose Energieprüfung anfragen'
                 : 'Weiter →'}
             </Button>
@@ -301,7 +341,9 @@ export function EnergyCheckWizard() {
             >
               {isLast
                 ? isPending
-                  ? 'Wird gesendet…'
+                  ? uploading
+                    ? 'Lädt…'
+                    : 'Wird gesendet…'
                   : 'Anfragen'
                 : 'Weiter →'}
             </Button>
@@ -522,6 +564,121 @@ function ConsentFields({
         </Link>
         .
       </p>
+    </div>
+  );
+}
+
+const UPLOAD_ACCEPT = 'application/pdf,image/jpeg,image/jpg,image/png';
+const UPLOAD_MAX_BYTES = 10 * 1024 * 1024;
+
+function formatBytes(n: number): string {
+  if (n < 1024) return `${n} B`;
+  if (n < 1024 * 1024) return `${(n / 1024).toFixed(0)} KB`;
+  return `${(n / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function WizardUpload({
+  file,
+  onFile,
+  busy,
+}: {
+  file: File | null;
+  onFile: (f: File | null) => void;
+  busy: boolean;
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [drag, setDrag] = useState(false);
+  const [localError, setLocalError] = useState<string | null>(null);
+
+  const accept = (f: File | undefined | null) => {
+    if (!f) return;
+    const t = (f.type || '').toLowerCase();
+    if (!UPLOAD_ACCEPT.split(',').includes(t)) {
+      setLocalError('Nur PDF, JPG oder PNG sind möglich.');
+      return;
+    }
+    if (f.size > UPLOAD_MAX_BYTES) {
+      setLocalError('Die Datei darf maximal 10 MB groß sein.');
+      return;
+    }
+    setLocalError(null);
+    onFile(f);
+  };
+
+  if (file) {
+    return (
+      <div className="flex items-center gap-3 rounded-elo border border-sage/40 bg-sage/5 px-4 py-3">
+        <span aria-hidden className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-sage/15 text-sage">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
+            <path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8m-5-5l5 5m-5-5v5h5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-[14px] font-medium text-ink">{file.name}</p>
+          <p className="text-[12px] text-muted">{formatBytes(file.size)} · angehängt</p>
+        </div>
+        <button
+          type="button"
+          disabled={busy}
+          onClick={() => {
+            onFile(null);
+            if (inputRef.current) inputRef.current.value = '';
+          }}
+          className="shrink-0 text-[12.5px] font-medium text-muted hover:text-leadRed disabled:opacity-40"
+        >
+          Entfernen
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <input
+        ref={inputRef}
+        type="file"
+        className="sr-only"
+        accept={UPLOAD_ACCEPT}
+        onChange={(e) => accept(e.target.files?.[0])}
+      />
+      <button
+        type="button"
+        onClick={() => inputRef.current?.click()}
+        onDragEnter={(e) => {
+          e.preventDefault();
+          setDrag(true);
+        }}
+        onDragOver={(e) => {
+          e.preventDefault();
+          setDrag(true);
+        }}
+        onDragLeave={() => setDrag(false)}
+        onDrop={(e) => {
+          e.preventDefault();
+          setDrag(false);
+          accept(e.dataTransfer.files?.[0]);
+        }}
+        className={`flex w-full items-center gap-3 rounded-elo border border-dashed px-4 py-4 text-left transition-colors ${
+          drag ? 'border-sage bg-sage/[0.06]' : 'border-borderLight bg-card hover:border-sage/50'
+        }`}
+      >
+        <span aria-hidden className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-sage/10 text-sage">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
+            <path d="M12 16V4m0 0l-4 4m4-4l4 4M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </span>
+        <span className="min-w-0">
+          <span className="block text-[14px] font-medium text-ink">
+            Rechnung hierher ziehen oder auswählen
+          </span>
+          <span className="block text-[12.5px] text-muted">PDF, JPG oder PNG · max. 10 MB · optional</span>
+        </span>
+      </button>
+      {localError && (
+        <p role="alert" className="mt-1.5 text-[12.5px] text-leadRed">
+          {localError}
+        </p>
+      )}
     </div>
   );
 }

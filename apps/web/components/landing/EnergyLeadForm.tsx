@@ -7,6 +7,7 @@ import { Button, Checkbox, Field, GlassCard } from '@elo/ui';
 import { energyLandingContent } from '@/data/energyLandingContent';
 import { validateLeadForm, toLeadPayload } from '@/lib/leadValidation';
 import { submitLandingLead } from '@/lib/leadSubmit';
+import { uploadLeadFile } from '@/lib/uploadFile';
 import { ENERGY_LEAD_FORM_ID } from '@/lib/scrollToEnergyForm';
 import { CONSENT_TEXTS } from '@/lib/consent';
 import type { LeadCategory, LeadFormErrors, SubmitStatus } from '@/types/lead';
@@ -110,6 +111,24 @@ export function EnergyLeadForm({
     }
     setStatus('submitting');
     try {
+      if (file) {
+        try {
+          const uploaded = await uploadLeadFile(file);
+          payload.filePathname = uploaded.pathname;
+          payload.fileName = uploaded.fileName;
+          payload.fileType = uploaded.fileType;
+          payload.fileSize = uploaded.fileSize;
+        } catch (uploadErr) {
+          setStatus('idle');
+          setErrors({
+            file:
+              uploadErr instanceof Error
+                ? uploadErr.message
+                : 'Die Datei konnte nicht hochgeladen werden.',
+          });
+          return;
+        }
+      }
       const result = await submitLandingLead(payload);
       setStatus('success');
       if (result.referralCode) {

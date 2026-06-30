@@ -22,6 +22,7 @@
     "@elo/scoring": "workspace:*",
     "@elo/storage": "workspace:*",
     "@elo/ui": "workspace:*",
+    "@vercel/blob": "2.4.0",
     "argon2": "^0.41.1",
     "framer-motion": "^11.11.0",
     "next": "15.5.18",

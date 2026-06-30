@@ -30,6 +30,10 @@ const payloadSchema = z.object({
   pagePath: z.string().max(240).optional(),
   technicalRequestId: z.string().max(120).optional(),
   submittedAtMs: z.number().int().nonnegative(),
+  /** Hochgeladene Rechnung (Blob-Pfad + Metadaten, siehe /api/upload). */
+  filePathname: z.string().max(300).startsWith('leads/').optional(),
+  fileName: z.string().max(260).optional(),
+  fileType: z.string().max(120).optional(),
   /** Optional: Empfehlungscode des werbenden Leads (aus /empfehlung/[code]). */
   referredByCode: z.string().min(4).max(16).optional(),
   /** First-Touch-UTM-Daten aus Client-Cookie (siehe UtmCookieSetter). */
@@ -167,14 +171,19 @@ export async function submitLead(formData: FormData): Promise<SubmitResult> {
     invalidContact: isLikelyDisposableEmail(input.email),
   });
 
-  // Dublettenprüfung
+  // Dublettenprüfung (darf den Lead-Eingang nie blockieren)
   const storage = getStorage();
-  const dup = await storage.findDuplicate({
-    email: input.email,
-    phone: input.phone,
-    name: `${input.firstName} ${input.lastName}`,
-    postalCode: input.postalCode,
-  });
+  let dup: Lead | null = null;
+  try {
+    dup = await storage.findDuplicate({
+      email: input.email,
+      phone: input.phone,
+      name: `${input.firstName} ${input.lastName}`,
+      postalCode: input.postalCode,
+    });
+  } catch {
+    dup = null;
+  }
 
   const id = newId('lead') as LeadId;
   const now = nowIso();
@@ -183,8 +192,12 @@ export async function submitLead(formData: FormData): Promise<SubmitResult> {
   const ownReferralCode = newReferralCode();
   let referredByLeadId: LeadId | undefined;
   if (payload.referredByCode) {
-    const referrer = await storage.findLeadByReferralCode(payload.referredByCode);
-    if (referrer) referredByLeadId = referrer.id;
+    try {
+      const referrer = await storage.findLeadByReferralCode(payload.referredByCode);
+      if (referrer) referredByLeadId = referrer.id;
+    } catch {
+      /* Referral-Auflösung ist optional. */
+    }
   }
 
   const sourceDetails = payload.referrer
@@ -228,21 +241,45 @@ export async function submitLead(formData: FormData): Promise<SubmitResult> {
     status: result.color === 'black' ? 'Gesperrt' : 'Neu',
     notes: dup ? [{ id: newId('note'), createdAt: now, author: 'system', text: `Mögliche Dublette zu Lead ${dup.id}.` }] : [],
     contactHistory: [],
-    files: [],
+    files: payload.filePathname
+      ? [
+          {
+            id: newId('file'),
+            createdAt: now,
+            fileName: payload.fileName ?? 'Rechnung',
+            fileType: payload.fileType ?? 'application/octet-stream',
+            fileUrl: payload.filePathname,
+            category: 'invoice',
+          },
+        ]
+      : [],
     isDemo: false,
   };
 
-  await storage.createLead(lead);
-  await logAudit({
-    ctx: {
-      actorId: 'anonymous',
-      actorRole: 'anonymous',
-      ipHash,
-    },
-    action: 'lead.created',
-    entity: 'lead',
-    entityId: id,
-  });
+  try {
+    await storage.createLead(lead);
+  } catch (err) {
+    console.error('[submitLead] createLead failed', err);
+    return {
+      ok: false,
+      error: 'Ihre Anfrage konnte gerade nicht gespeichert werden. Bitte versuchen Sie es in einem Moment erneut.',
+    };
+  }
+
+  try {
+    await logAudit({
+      ctx: {
+        actorId: 'anonymous',
+        actorRole: 'anonymous',
+        ipHash,
+      },
+      action: 'lead.created',
+      entity: 'lead',
+      entityId: id,
+    });
+  } catch {
+    /* Audit darf den Lead-Eingang nie blockieren. */
+  }
 
   // Mails: nur wenn nicht gesperrt
   if (lead.leadColor !== 'black') {
