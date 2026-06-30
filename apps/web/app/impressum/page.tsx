@@ -7,13 +7,14 @@ import { COMPANY_INFO } from '@/data/companyInfo';
 export const metadata: Metadata = {
   title: 'Impressum | AGI Energy',
   description:
-    'Impressum von AGI Energy – Angaben gemäß § 5 DDG, Anbieterinformationen, Verantwortlichkeit, Kontakt und rechtliche Hinweise.',
+    'Impressum von AGI Energy – Anbieterkennzeichnung, Kontakt, Verantwortlichkeit und rechtliche Hinweise gemäß § 5 DDG.',
   alternates: { canonical: 'https://www.agienergy.de/impressum' },
   robots: { index: true, follow: true },
 };
 
 const hasVatId = COMPANY_INFO.vatId.trim().length > 0;
 const phoneHref = `tel:${COMPANY_INFO.contactPhone.replace(/\s+/g, '')}`;
+const lastUpdatedDe = COMPANY_INFO.lastUpdated.split('-').reverse().join('.');
 
 const legalSections = [
   { id: 'angaben', label: 'Angaben gemäß § 5 DDG' },
@@ -22,12 +23,22 @@ const legalSections = [
   { id: 'leistungsbereich', label: 'Leistungsbereich' },
   { id: 'umsatzsteuer', label: 'Umsatzsteuer' },
   { id: 'technik', label: 'Technische Umsetzung' },
+  { id: 'streitbeilegung', label: 'Verbraucherstreitbeilegung' },
   { id: 'haftung-inhalte', label: 'Haftung für Inhalte' },
   { id: 'haftung-links', label: 'Haftung für externe Links' },
-  { id: 'urheberrecht', label: 'Urheberrecht' },
-  { id: 'streitbeilegung', label: 'Verbraucherstreitbeilegung' },
+  { id: 'urheberrecht', label: 'Urheberrecht und Schutzrechte' },
   { id: 'datenschutz', label: 'Datenschutz' },
-  { id: 'rechtliche-hinweise', label: 'Rechtliche Hinweise' },
+  { id: 'rechtliche-hinweise', label: 'Kontakt bei rechtlichen Hinweisen' },
+] as const;
+
+const serviceScope = [
+  'Strom',
+  'Gas',
+  'Photovoltaik',
+  'Anbieterwechsel',
+  'Jahresabrechnungen',
+  'Verbrauchsoptimierung',
+  'Gewerbeenergie',
 ] as const;
 
 export default function ImpressumPage() {
@@ -57,9 +68,8 @@ export default function ImpressumPage() {
             </h1>
             <p className="mt-4 max-w-2xl text-[15.5px] leading-relaxed text-slate">
               Angaben gemäß § 5 Digitale-Dienste-Gesetz für das Internetangebot
-              von AGI Energy.
+              von AGI Energy, einem Angebot von {c.responsiblePerson}.
             </p>
-            <p className="mt-3 text-[13px] text-slate/70">Stand: {c.lastUpdated}</p>
           </header>
 
           <div className="mt-10 grid gap-10 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-start">
@@ -81,21 +91,21 @@ export default function ImpressumPage() {
 
                 <div className="mt-5 grid gap-3 rounded-elo border border-borderLight bg-white p-4 text-[14.5px] sm:grid-cols-2">
                   <p>
-                    <span className="font-medium text-navy">E-Mail:</span>{' '}
-                    <a
-                      href={`mailto:${c.contactEmail}`}
-                      className="text-premiumBlue underline underline-offset-4 hover:text-energyGreen"
-                    >
-                      {c.contactEmail}
-                    </a>
-                  </p>
-                  <p>
                     <span className="font-medium text-navy">Telefon:</span>{' '}
                     <a
                       href={phoneHref}
                       className="text-premiumBlue underline underline-offset-4 hover:text-energyGreen"
                     >
                       {c.contactPhone}
+                    </a>
+                  </p>
+                  <p>
+                    <span className="font-medium text-navy">E-Mail:</span>{' '}
+                    <a
+                      href={`mailto:${c.contactEmail}`}
+                      className="text-premiumBlue underline underline-offset-4 hover:text-energyGreen"
+                    >
+                      {c.contactEmail}
                     </a>
                   </p>
                   <p className="sm:col-span-2">
@@ -127,6 +137,10 @@ export default function ImpressumPage() {
                 id="verantwortliche"
                 title="Inhaltlich Verantwortliche gemäß § 18 Abs. 2 MStV"
               >
+                <p>
+                  Verantwortlich für journalistisch-redaktionelle Inhalte, soweit
+                  solche Inhalte auf dieser Website bereitgestellt werden:
+                </p>
                 <AddressBlock>
                   {c.pressResponsible}
                   <br />
@@ -142,23 +156,32 @@ export default function ImpressumPage() {
                 <p>
                   AGI Energy stellt Informationen und Kontaktmöglichkeiten im
                   Bereich persönlicher Energieprüfung bereit. Der Leistungsbereich
-                  umfasst insbesondere Anfragen zu Strom, Gas, Photovoltaik,
-                  Anbieterwechsel, Jahresabrechnungen, Verbrauchsoptimierung und
-                  Gewerbeenergie.
+                  umfasst insbesondere Anfragen zu:
                 </p>
+                <ul className="mt-1 grid gap-2 sm:grid-cols-2">
+                  {serviceScope.map((item) => (
+                    <li key={item} className="flex items-start gap-2.5">
+                      <span
+                        aria-hidden="true"
+                        className="mt-[0.6em] size-1.5 shrink-0 rounded-full bg-energyGreen/70"
+                      />
+                      <span className="text-navy">{item}</span>
+                    </li>
+                  ))}
+                </ul>
                 <p>
                   Die Inhalte dieser Website dienen der ersten Information und
-                  Kontaktaufnahme. Eine individuelle Prüfung, Empfehlung oder
-                  Vermittlung erfolgt erst auf Grundlage der im Einzelfall
-                  bereitgestellten Angaben.
+                  Kontaktaufnahme. Eine individuelle Prüfung, Empfehlung,
+                  Vermittlung oder Angebotserstellung erfolgt erst auf Grundlage der
+                  im Einzelfall bereitgestellten Angaben.
                 </p>
                 <p>
                   AGI Energy ist kein Energieversorgungsunternehmen, kein
                   Netzbetreiber und kein anonymes Tarifportal. Konkrete Angebote,
                   Einsparpotenziale, Verfügbarkeiten und Konditionen hängen vom
-                  jeweiligen Einzelfall, dem Standort, dem Verbrauchsprofil,
-                  bestehenden Vertragsverhältnissen und den verfügbaren
-                  Marktbedingungen ab.
+                  jeweiligen Einzelfall, insbesondere Standort, Verbrauchsprofil,
+                  bestehendem Vertragsverhältnis, technischer Ausgangslage und den
+                  jeweils verfügbaren Marktbedingungen ab.
                 </p>
               </LegalSection>
 
@@ -169,10 +192,16 @@ export default function ImpressumPage() {
                     Umsatzsteuergesetz: {c.vatId}
                   </p>
                 ) : (
-                  <p>
-                    Es besteht derzeit keine Umsatzsteuer-Identifikationsnummer
-                    gemäß § 27a UStG.
-                  </p>
+                  <>
+                    <p>
+                      Umsatzsteuer-Identifikationsnummer gemäß § 27a
+                      Umsatzsteuergesetz: nicht angegeben
+                    </p>
+                    <p>
+                      Eine Steuernummer wird aus Datenschutz- und
+                      Sicherheitsgründen nicht im Impressum veröffentlicht.
+                    </p>
+                  </>
                 )}
               </LegalSection>
 
@@ -180,14 +209,27 @@ export default function ImpressumPage() {
                 <p>
                   Die technische Umsetzung, Wartung, Weiterentwicklung und
                   Verwaltung dieser Website kann durch externe technische
-                  Dienstleister erfolgen, insbesondere AGI Works / Nexcel AI.
+                  Dienstleister erfolgen, insbesondere durch AGI Works / Nexcel AI.
                 </p>
                 <p>
                   Technische Dienstleister handeln nicht als Anbieter dieses
-                  Internetangebots, sondern ausschließlich im Rahmen der
-                  technischen Bereitstellung, Verwaltung und Verarbeitung nach
-                  Weisung der Anbieterin, soweit dies datenschutzrechtlich
-                  erforderlich ist.
+                  Internetangebots. Sie unterstützen ausschließlich bei der
+                  technischen Bereitstellung, Systemverwaltung,
+                  Formularverarbeitung, Leadverwaltung, Wartung und Weiterleitung
+                  eingehender Anfragen nach Weisung der Anbieterin, soweit dies
+                  datenschutzrechtlich erforderlich ist.
+                </p>
+                <p>
+                  Die inhaltliche, geschäftliche und rechtliche Verantwortung für
+                  dieses Internetangebot liegt bei {c.responsiblePerson}.
+                </p>
+              </LegalSection>
+
+              <LegalSection id="streitbeilegung" title="Verbraucherstreitbeilegung">
+                <p>
+                  Wir sind nicht verpflichtet und nicht bereit, an
+                  Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle
+                  teilzunehmen.
                 </p>
               </LegalSection>
 
@@ -206,7 +248,9 @@ export default function ImpressumPage() {
                 <p>
                   Verpflichtungen zur Entfernung oder Sperrung der Nutzung von
                   Informationen nach den allgemeinen Gesetzen bleiben hiervon
-                  unberührt.
+                  unberührt. Bei Bekanntwerden konkreter Rechtsverletzungen werden
+                  betroffene Inhalte unverzüglich geprüft und erforderlichenfalls
+                  entfernt.
                 </p>
               </LegalSection>
 
@@ -223,19 +267,19 @@ export default function ImpressumPage() {
                   diesem Zeitpunkt nicht erkennbar.
                 </p>
                 <p>
-                  Eine permanente Kontrolle externer Links ist ohne konkrete
+                  Eine permanente Kontrolle verlinkter Seiten ist ohne konkrete
                   Hinweise auf Rechtsverletzungen nicht zumutbar. Bei Bekanntwerden
                   entsprechender Rechtsverletzungen werden betroffene Links
                   unverzüglich entfernt.
                 </p>
               </LegalSection>
 
-              <LegalSection id="urheberrecht" title="Urheberrecht">
+              <LegalSection id="urheberrecht" title="Urheberrecht und Schutzrechte">
                 <p>
                   Die auf dieser Website veröffentlichten Inhalte, Texte,
-                  Strukturen, Designs, Grafiken, Markenbestandteile, Bildwelten und
-                  sonstigen Elemente unterliegen dem deutschen Urheberrecht und
-                  sonstigen Schutzrechten.
+                  Strukturen, Designs, Grafiken, Markenbestandteile, Bildwelten,
+                  Dokumente und sonstigen Werke unterliegen dem deutschen
+                  Urheberrecht und sonstigen Schutzrechten.
                 </p>
                 <p>
                   Jede Nutzung, Vervielfältigung, Bearbeitung, öffentliche
@@ -246,19 +290,11 @@ export default function ImpressumPage() {
                 <p>
                   Soweit Inhalte auf dieser Website nicht von der Anbieterin
                   erstellt wurden, werden Rechte Dritter beachtet und entsprechende
-                  Inhalte gekennzeichnet. Sollten Sie dennoch auf eine mögliche
+                  Inhalte gekennzeichnet. Sollten Sie auf eine mögliche
                   Rechtsverletzung aufmerksam werden, bitten wir um einen
                   entsprechenden Hinweis. Bei Bekanntwerden von Rechtsverletzungen
                   werden betroffene Inhalte unverzüglich geprüft und
                   erforderlichenfalls entfernt.
-                </p>
-              </LegalSection>
-
-              <LegalSection id="streitbeilegung" title="Verbraucherstreitbeilegung">
-                <p>
-                  Wir sind nicht verpflichtet und nicht bereit, an
-                  Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle
-                  teilzunehmen.
                 </p>
               </LegalSection>
 
@@ -275,7 +311,8 @@ export default function ImpressumPage() {
                   .
                 </p>
                 <p>
-                  Ergänzende Informationen zu Cookies finden Sie in der{' '}
+                  Ergänzende Informationen zu Cookies und vergleichbaren
+                  Technologien finden Sie in unserer{' '}
                   <Link
                     href="/cookie-richtlinie"
                     className="text-premiumBlue underline underline-offset-4 hover:text-energyGreen"
@@ -301,6 +338,10 @@ export default function ImpressumPage() {
                   </a>
                 </p>
               </LegalSection>
+
+              <p className="border-t border-borderLight pt-6 text-[12.5px] text-slate/60">
+                Stand: {lastUpdatedDe}
+              </p>
             </article>
 
             <aside className="lg:sticky lg:top-[calc(var(--agi-header-row)+2rem)]">
@@ -320,17 +361,17 @@ export default function ImpressumPage() {
                   </MetaItem>
                   <MetaItem label="Kontakt">
                     <a
-                      href={`mailto:${c.contactEmail}`}
-                      className="text-premiumBlue underline underline-offset-4 hover:text-energyGreen"
-                    >
-                      {c.contactEmail}
-                    </a>
-                    <br />
-                    <a
                       href={phoneHref}
                       className="text-premiumBlue underline underline-offset-4 hover:text-energyGreen"
                     >
                       {c.contactPhone}
+                    </a>
+                    <br />
+                    <a
+                      href={`mailto:${c.contactEmail}`}
+                      className="text-premiumBlue underline underline-offset-4 hover:text-energyGreen"
+                    >
+                      {c.contactEmail}
                     </a>
                   </MetaItem>
                 </dl>
